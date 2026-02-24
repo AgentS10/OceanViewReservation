@@ -1,0 +1,96 @@
+@startuml OceanViewReservation_UseCaseDiagram
+' =========================================================
+' CIS6003 Advanced Programming — WRIT1 Assignment 2025/26
+' Author: Mohamed Subair Mohamed Sajidh
+' Use Case Diagram — Ocean View Resort Reservation System
+' =========================================================
+
+skinparam actorStyle awesome
+skinparam usecaseFontSize 11
+skinparam shadowing false
+
+left to right direction
+
+actor "Staff"   as STAFF
+actor "Manager" as MANAGER
+actor "Admin"   as ADMIN
+
+MANAGER --|> STAFF
+ADMIN   --|> MANAGER
+
+rectangle "Ocean View Resort Reservation System" {
+
+    ' ── Authentication ──
+    package "Authentication" {
+        usecase "Login"          as UC_LOGIN
+        usecase "Logout"         as UC_LOGOUT
+        usecase "Check Session"  as UC_STATUS
+    }
+
+    ' ── Reservations ──
+    package "Reservation Management" {
+        usecase "Create Reservation"     as UC_CREATE
+        usecase "View All Reservations"  as UC_LIST
+        usecase "View Reservation Detail" as UC_DETAIL
+        usecase "Search Reservations"    as UC_SEARCH
+        usecase "Update Reservation"     as UC_UPDATE
+        usecase "Check In Guest"         as UC_CHECKIN
+        usecase "Check Out Guest"        as UC_CHECKOUT
+        usecase "Cancel Reservation"     as UC_CANCEL
+        usecase "Calculate Bill"         as UC_BILL
+    }
+
+    ' ── Help ──
+    package "System" {
+        usecase "View Help Guide"   as UC_HELP
+    }
+
+    ' ── Admin ──
+    package "Administration" {
+        usecase "View Admin Dashboard"    as UC_ADMINDASH
+        usecase "Monitor Active Sessions" as UC_SESSIONS
+        usecase "Terminate Session"       as UC_TERMINATE
+        usecase "View System Statistics"  as UC_STATS
+    }
+
+    ' ── User Management ──
+    package "User Management" {
+        usecase "List Users"         as UC_USERLIST
+        usecase "Create User"        as UC_USERCREATE
+        usecase "Edit User"          as UC_USEREDIT
+        usecase "Delete User"        as UC_USERDELETE
+        usecase "Toggle User Status" as UC_USERTOGGLE
+        usecase "Change Password"    as UC_CHANGEPWD
+    }
+}
+
+' ── Staff associations ──
+STAFF --> UC_LOGIN
+STAFF --> UC_LOGOUT
+STAFF --> UC_STATUS
+STAFF --> UC_CREATE
+STAFF --> UC_LIST
+STAFF --> UC_DETAIL
+STAFF --> UC_SEARCH
+STAFF --> UC_UPDATE
+STAFF --> UC_CHECKIN
+STAFF --> UC_BILL
+STAFF --> UC_HELP
+
+' ── Manager additional ──
+MANAGER --> UC_CHECKOUT
+MANAGER --> UC_CANCEL
+MANAGER --> UC_ADMINDASH
+MANAGER --> UC_STATS
+
+' ── Admin additional ──
+ADMIN --> UC_SESSIONS
+ADMIN --> UC_TERMINATE
+ADMIN --> UC_USERLIST
+ADMIN --> UC_USERCREATE
+ADMIN --> UC_USEREDIT
+ADMIN --> UC_USERDELETE
+ADMIN --> UC_USERTOGGLE
+ADMIN --> UC_CHANGEPWD
+
+@enduml

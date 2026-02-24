@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Reservation — Ocean View Resort</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <a class="navbar-brand" href="/dashboard.html"><span class="brand-icon">🌊</span> Ocean View Resort</a>
+    <ul class="navbar-nav">
+        <li><a href="/dashboard.html">🏠 Dashboard</a></li>
+        <li><a href="/reservations.html">📋 Reservations</a></li>
+        <li><a href="/add-reservation.html">➕ New</a></li>
+        <li><a href="/help.html">❓ Help</a></li>
+        <ul id="admin-nav-links" class="navbar-nav" style="display:contents"></ul>
+    </ul>
+    <div class="navbar-right">
+        <div class="navbar-user-info">
+            <div class="navbar-user-name" id="nav-username"></div>
+            <div class="navbar-user-role" id="nav-role"></div>
+        </div>
+        <button id="btn-logout">⏻ Logout</button>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1>Add New Reservation</h1>
+        <p>Fill in the guest and booking details below.</p>
+    </div>
+
+    <div id="alert-box" class="alert hidden"></div>
+
+    <div class="card">
+        <div class="card-title">Guest Information</div>
+        <form id="add-reservation-form" autocomplete="off">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="guestName">Guest Name <span style="color:red">*</span></label>
+                    <input type="text" id="guestName" class="form-control" placeholder="e.g. Nalaka Perera" required>
+                    <div class="invalid-feedback">Guest name is required.</div>
+                </div>
+                <div class="form-group">
+                    <label for="contactNumber">Contact Number <span style="color:red">*</span></label>
+                    <input type="tel" id="contactNumber" class="form-control" placeholder="e.g. +94771234567" required>
+                    <div class="invalid-feedback">Enter a valid contact number.</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" class="form-control" placeholder="Guest's home address">
+            </div>
+
+            <div class="card-title" style="margin-top:1rem">Booking Details</div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="roomTypeName">Room Type <span style="color:red">*</span></label>
+                    <select id="roomTypeName" class="form-control" required>
+                        <option value="">— Select Room Type —</option>
+                    </select>
+                    <div class="invalid-feedback">Please select a room type.</div>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <div id="room-info" style="padding:.6rem;background:#f0f6fc;border-radius:6px;font-size:.85rem;color:#495057;min-height:40px;">
+                        Select a room type to see details.
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="checkInDate">Check-In Date <span style="color:red">*</span></label>
+                    <input type="date" id="checkInDate" class="form-control" required>
+                    <div class="invalid-feedback">Check-in date is required.</div>
+                </div>
+                <div class="form-group">
+                    <label for="checkOutDate">Check-Out Date <span style="color:red">*</span></label>
+                    <input type="date" id="checkOutDate" class="form-control" required>
+                    <div class="invalid-feedback">Check-out must be after check-in.</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="specialRequests">Special Requests</label>
+                <textarea id="specialRequests" class="form-control" rows="3"
+                    placeholder="e.g. Late check-in, extra pillows, anniversary decoration…"></textarea>
+            </div>
+
+            <div class="action-bar">
+                <a href="/reservations.html" class="btn btn-secondary">← Cancel</a>
+                <button type="submit" id="btn-save" class="btn btn-success">Save Reservation</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script>
+    // Show room info when selection changes
+    document.addEventListener('DOMContentLoaded', () => {
+        RoomAPI.getAll().then(rooms => {
+            const sel = document.getElementById('roomTypeName');
+            const info = document.getElementById('room-info');
+            rooms.forEach(rt => {
+                const opt = document.createElement('option');
+                opt.value = rt.typeName;
+                opt.dataset.desc  = rt.description;
+                opt.dataset.price = rt.pricePerNight;
+                opt.dataset.cap   = rt.capacity;
+                opt.textContent   = rt.typeName + '  (LKR ' + Number(rt.pricePerNight).toLocaleString() + '/night)';
+                sel.appendChild(opt);
+            });
+            sel.addEventListener('change', () => {
+                const opt = sel.options[sel.selectedIndex];
+                if (opt.value) {
+                    info.innerHTML = `<strong>${opt.value}</strong> &nbsp;|&nbsp; LKR ${Number(opt.dataset.price).toLocaleString()}/night &nbsp;|&nbsp; Capacity: ${opt.dataset.cap}<br><small>${opt.dataset.desc}</small>`;
+                } else {
+                    info.textContent = 'Select a room type to see details.';
+                }
+            });
+        });
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('checkInDate').setAttribute('min', today);
+        document.getElementById('checkInDate').addEventListener('change', function(){
+            document.getElementById('checkOutDate').setAttribute('min', this.value);
+        });
+    });
+</script>
+<script src="/js/reservation.js"></script>
+</body>
+</html>

@@ -1,0 +1,292 @@
+@startuml OceanViewReservation_ClassDiagram
+' =========================================================
+' CIS6003 Advanced Programming — WRIT1 Assignment 2025/26
+' Author: Mohamed Subair Mohamed Sajidh
+' Class Diagram — Ocean View Resort Reservation System
+' =========================================================
+
+skinparam classAttributeIconSize 0
+skinparam classFontSize 11
+skinparam packageFontSize 12
+skinparam shadowing false
+skinparam linetype ortho
+
+' ── Models ──────────────────────────────────────────────
+package "com.oceanview.model" {
+
+    class User {
+        - id : int
+        - username : String
+        - passwordHash : String
+        - fullName : String
+        - email : String
+        - role : String
+        - active : boolean
+        - createdAt : String
+        + toJson() : String
+        + getters/setters
+    }
+
+    class Reservation {
+        - id : int
+        - reservationNumber : String
+        - guestName : String
+        - address : String
+        - contactNumber : String
+        - roomTypeId : int
+        - roomTypeName : String
+        - pricePerNight : double
+        - checkInDate : String
+        - checkOutDate : String
+        - status : String
+        - specialRequests : String
+        - createdBy : String
+        - createdAt : String
+        + toJson() : String
+        + getters/setters
+    }
+
+    class RoomType {
+        - id : int
+        - typeName : String
+        - description : String
+        - pricePerNight : double
+        - capacity : int
+        + toJson() : String
+        + getters/setters
+    }
+
+    class Bill {
+        - reservationNumber : String
+        - guestName : String
+        - roomTypeName : String
+        - pricePerNight : double
+        - numberOfNights : int
+        - subtotal : double
+        - taxRate : double
+        - taxAmount : double
+        - grandTotal : double
+        + calculate() : void
+        + toJson() : String
+    }
+}
+
+' ── Factory Pattern ──────────────────────────────────────
+package "com.oceanview.factory" {
+
+    interface Room {
+        + getRoomType() : String
+        + getPricePerNight() : double
+        + getDescription() : String
+        + getCapacity() : int
+        + toJson() : String
+    }
+
+    class StandardRoom implements Room {
+        + getRoomType() : String
+        + getPricePerNight() : double
+        + getDescription() : String
+        + getCapacity() : int
+    }
+
+    class DeluxeRoom implements Room {
+        + getRoomType() : String
+        + getPricePerNight() : double
+        + getDescription() : String
+        + getCapacity() : int
+    }
+
+    class SuiteRoom implements Room {
+        + getRoomType() : String
+        + getPricePerNight() : double
+        + getDescription() : String
+        + getCapacity() : int
+    }
+
+    class RoomFactory {
+        + {static} createRoom(type: String) : Room
+    }
+
+    RoomFactory ..> StandardRoom : creates
+    RoomFactory ..> DeluxeRoom   : creates
+    RoomFactory ..> SuiteRoom    : creates
+}
+
+' ── Observer Pattern ─────────────────────────────────────
+package "com.oceanview.observer" {
+
+    interface ReservationObserver {
+        + onReservationCreated(r: Reservation) : void
+        + onReservationUpdated(r: Reservation) : void
+        + onReservationCancelled(r: Reservation) : void
+    }
+
+    class ReservationNotifier {
+        - instance : ReservationNotifier
+        - observers : List<ReservationObserver>
+        + {static} getInstance() : ReservationNotifier
+        + addObserver(o: ReservationObserver) : void
+        + notifyCreated(r: Reservation) : void
+        + notifyUpdated(r: Reservation) : void
+        + notifyCancelled(r: Reservation) : void
+    }
+
+    class LogNotificationObserver implements ReservationObserver {
+        + onReservationCreated(r: Reservation) : void
+        + onReservationUpdated(r: Reservation) : void
+        + onReservationCancelled(r: Reservation) : void
+    }
+
+    ReservationNotifier o-- ReservationObserver : notifies
+}
+
+' ── DAOs ─────────────────────────────────────────────────
+package "com.oceanview.dao" {
+
+    class UserDAO {
+        + findAll() : List<User>
+        + findById(id: int) : User
+        + findByUsername(u: String) : User
+        + authenticate(u: String, pwd: String) : User
+        + create(user: User) : boolean
+        + update(user: User) : boolean
+        + delete(id: int) : boolean
+        + setActive(id: int, active: boolean) : boolean
+        + changePassword(id: int, hash: String) : boolean
+    }
+
+    class ReservationDAO {
+        + findAll() : List<Reservation>
+        + findByNumber(num: String) : Reservation
+        + search(query: String) : List<Reservation>
+        + create(r: Reservation) : boolean
+        + update(r: Reservation) : boolean
+        + updateStatus(num: String, status: String) : boolean
+        + delete(num: String) : boolean
+    }
+
+    class RoomTypeDAO {
+        + findAll() : List<RoomType>
+        + findById(id: int) : RoomType
+        + findByName(name: String) : RoomType
+    }
+}
+
+' ── Database Singleton ───────────────────────────────────
+package "com.oceanview.database" {
+
+    class DatabaseConnection {
+        - instance : DatabaseConnection
+        - connection : Connection
+        + {static} getInstance() : DatabaseConnection
+        + initialize() : void
+        + getConnection() : Connection
+        + close() : void
+    }
+}
+
+' ── Utilities ────────────────────────────────────────────
+package "com.oceanview.util" {
+
+    class SessionManager {
+        - instance : SessionManager
+        - sessions : Map<String, SessionInfo>
+        + {static} getInstance() : SessionManager
+        + createSession(user: User, ip: String) : String
+        + getUser(token: String) : User
+        + getSessionInfo(token: String) : SessionInfo
+        + getActiveSessions() : List<SessionInfo>
+        + terminateSession(token: String) : void
+        + invalidate(token: String) : void
+    }
+
+    class PasswordUtil {
+        + {static} hash(plain: String) : String
+        + {static} verify(plain: String, hash: String) : boolean
+    }
+
+    class ValidationUtil {
+        + {static} isValidContactNumber(n: String) : boolean
+        + {static} isValidDate(d: String) : boolean
+        + {static} nightsBetween(in: String, out: String) : long
+        + {static} isValidUsername(u: String) : boolean
+        + {static} isValidPassword(p: String) : boolean
+    }
+
+    class JsonUtil {
+        + {static} success(msg: String) : String
+        + {static} error(msg: String) : String
+        + {static} parseBody(body: String) : Map<String,String>
+    }
+}
+
+' ── Handlers ─────────────────────────────────────────────
+package "com.oceanview.handler" {
+
+    abstract class BaseHandler {
+        # sessions : SessionManager
+        # authenticate(ex: HttpExchange) : User
+        # requireRole(ex: HttpExchange, roles: String...) : User
+        # hasRole(user: User, role: String) : boolean
+        # sendJson(ex: HttpExchange, status: int, body: String) : void
+        # readBody(ex: HttpExchange) : String
+        # getPathParam(ex: HttpExchange, base: String) : String
+    }
+
+    class AuthHandler extends BaseHandler
+    class ReservationHandler extends BaseHandler
+    class BillHandler extends BaseHandler
+    class RoomHandler extends BaseHandler
+    class HelpHandler extends BaseHandler
+    class UserHandler extends BaseHandler
+    class AdminHandler extends BaseHandler
+    class StaticFileHandler
+}
+
+' ── Server ───────────────────────────────────────────────
+package "com.oceanview.server" {
+
+    class WebServer {
+        - port : int
+        - server : HttpServer
+        + start() : void
+        + stop() : void
+    }
+}
+
+class Main {
+    + {static} main(args: String[]) : void
+}
+
+' ── Relationships ────────────────────────────────────────
+UserDAO        ..> DatabaseConnection : uses
+ReservationDAO ..> DatabaseConnection : uses
+RoomTypeDAO    ..> DatabaseConnection : uses
+
+ReservationHandler ..> ReservationDAO        : uses
+ReservationHandler ..> RoomTypeDAO           : uses
+ReservationHandler ..> ReservationNotifier   : uses
+AuthHandler        ..> UserDAO               : uses
+AuthHandler        ..> SessionManager        : uses
+BillHandler        ..> ReservationDAO        : uses
+RoomHandler        ..> RoomTypeDAO           : uses
+UserHandler        ..> UserDAO               : uses
+AdminHandler       ..> ReservationDAO        : uses
+AdminHandler       ..> SessionManager        : uses
+
+WebServer ..> AuthHandler        : registers
+WebServer ..> ReservationHandler : registers
+WebServer ..> BillHandler        : registers
+WebServer ..> RoomHandler        : registers
+WebServer ..> HelpHandler        : registers
+WebServer ..> UserHandler        : registers
+WebServer ..> AdminHandler       : registers
+WebServer ..> StaticFileHandler  : registers
+
+Main ..> WebServer              : starts
+Main ..> DatabaseConnection     : initialises
+Main ..> ReservationNotifier    : configures
+
+Bill ..> ValidationUtil : uses
+
+@enduml

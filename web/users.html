@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management — Ocean View Resort</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <a class="navbar-brand" href="/dashboard.html"><span class="brand-icon">🌊</span> Ocean View Resort</a>
+    <ul class="navbar-nav">
+        <li><a href="/dashboard.html">🏠 Dashboard</a></li>
+        <li><a href="/reservations.html">📋 Reservations</a></li>
+        <li><a href="/add-reservation.html">➕ New</a></li>
+        <li><a href="/help.html">❓ Help</a></li>
+        <ul id="admin-nav-links" class="navbar-nav" style="display:contents"></ul>
+    </ul>
+    <div class="navbar-right">
+        <div class="navbar-user-info">
+            <div class="navbar-user-name" id="nav-username"></div>
+            <div class="navbar-user-role" id="nav-role"></div>
+        </div>
+        <button id="btn-logout">⏻ Logout</button>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+    <div class="page-header-row">
+        <div class="page-header" style="margin:0">
+            <h1>👥 User Management</h1>
+            <p>Create, edit, activate/deactivate and delete system users. Admin only.</p>
+        </div>
+        <button class="btn btn-success" id="btn-add-user">➕ Add User</button>
+    </div>
+
+    <div id="alert-box" class="alert hidden"></div>
+
+    <div class="card">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="users-tbody">
+                    <tr><td colspan="8" class="loading-center"><span class="spinner"></span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add / Edit User Modal -->
+<div class="modal-overlay" id="user-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modal-title">Add New User</h3>
+            <button class="modal-close" id="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="modal-alert" class="alert hidden"></div>
+            <input type="hidden" id="edit-user-id">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="f-username">Username</label>
+                    <input type="text" id="f-username" class="form-control" placeholder="e.g. john_doe">
+                    <div class="invalid-feedback">Username required (3–30 chars, alphanumeric/_)</div>
+                </div>
+                <div class="form-group">
+                    <label for="f-role">Role</label>
+                    <select id="f-role" class="form-control">
+                        <option value="STAFF">Staff</option>
+                        <option value="MANAGER">Manager</option>
+                        <option value="ADMIN">Admin</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="f-fullname">Full Name</label>
+                <input type="text" id="f-fullname" class="form-control" placeholder="e.g. John Doe">
+                <div class="invalid-feedback">Full name is required.</div>
+            </div>
+            <div class="form-group">
+                <label for="f-email">Email</label>
+                <input type="email" id="f-email" class="form-control" placeholder="e.g. john@oceanviewresort.lk">
+            </div>
+            <div class="form-group" id="pwd-group">
+                <label for="f-password">Password <span style="color:var(--danger)">*</span></label>
+                <input type="password" id="f-password" class="form-control" placeholder="Min. 6 characters">
+                <div class="invalid-feedback">Password must be at least 6 characters.</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+            <button class="btn btn-success" id="modal-save-btn">Save User</button>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="pwd-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>🔑 Change Password</h3>
+            <button class="modal-close" id="pwd-modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="pwd-modal-alert" class="alert hidden"></div>
+            <input type="hidden" id="pwd-user-id">
+            <p id="pwd-user-label" style="font-size:.88rem;color:var(--grey-700);margin-bottom:1rem"></p>
+            <div class="form-group">
+                <label for="new-password">New Password</label>
+                <input type="password" id="new-password" class="form-control" placeholder="Min. 6 characters">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="pwd-cancel-btn">Cancel</button>
+            <button class="btn btn-primary" id="pwd-save-btn">Change Password</button>
+        </div>
+    </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script>
+    requireAuth();
+    if (getRole() !== 'ADMIN') { window.location.href = '/dashboard.html'; }
+    renderNavUser();
+
+    const myUser = getUser();
+
+    // ── Modal helpers ────────────────────────────────────────────
+    function openModal(id) { document.getElementById(id).classList.add('open'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+    function modalAlert(containerId, msg, type) {
+        const el = document.getElementById(containerId);
+        el.className = 'alert alert-' + type;
+        el.textContent = msg;
+        el.classList.remove('hidden');
+    }
+    function clearModalAlert(id) { document.getElementById(id).classList.add('hidden'); }
+
+    document.getElementById('modal-close-btn').addEventListener('click',  () => closeModal('user-modal'));
+    document.getElementById('modal-cancel-btn').addEventListener('click', () => closeModal('user-modal'));
+    document.getElementById('pwd-modal-close').addEventListener('click',  () => closeModal('pwd-modal'));
+    document.getElementById('pwd-cancel-btn').addEventListener('click',   () => closeModal('pwd-modal'));
+    document.getElementById('user-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal('user-modal'); });
+    document.getElementById('pwd-modal').addEventListener('click',  e => { if (e.target === e.currentTarget) closeModal('pwd-modal'); });
+
+    // ── Add user ─────────────────────────────────────────────────
+    document.getElementById('btn-add-user').addEventListener('click', () => {
+        document.getElementById('modal-title').textContent  = 'Add New User';
+        document.getElementById('edit-user-id').value       = '';
+        document.getElementById('f-username').value         = '';
+        document.getElementById('f-username').disabled      = false;
+        document.getElementById('f-fullname').value         = '';
+        document.getElementById('f-email').value            = '';
+        document.getElementById('f-role').value             = 'STAFF';
+        document.getElementById('f-password').value         = '';
+        document.getElementById('pwd-group').style.display  = '';
+        clearModalAlert('modal-alert');
+        openModal('user-modal');
+    });
+
+    document.getElementById('modal-save-btn').addEventListener('click', async () => {
+        const id       = document.getElementById('edit-user-id').value;
+        const username = document.getElementById('f-username').value.trim();
+        const fullName = document.getElementById('f-fullname').value.trim();
+        const email    = document.getElementById('f-email').value.trim();
+        const role     = document.getElementById('f-role').value;
+        const password = document.getElementById('f-password').value;
+
+        clearModalAlert('modal-alert');
+
+        if (!fullName) { modalAlert('modal-alert', 'Full name is required.', 'danger'); return; }
+
+        const btn = document.getElementById('modal-save-btn');
+        btn.disabled = true; btn.textContent = 'Saving…';
+
+        try {
+            let res;
+            if (id) {
+                res = await UserAPI.update(id, { fullName, email, role });
+            } else {
+                if (!username || username.length < 3) { modalAlert('modal-alert', 'Username must be at least 3 characters.', 'danger'); btn.disabled = false; btn.textContent = 'Save User'; return; }
+                if (!password || password.length < 6) { modalAlert('modal-alert', 'Password must be at least 6 characters.', 'danger'); btn.disabled = false; btn.textContent = 'Save User'; return; }
+                res = await UserAPI.create({ username, fullName, email, role, password });
+            }
+            if (res.success) {
+                closeModal('user-modal');
+                showAlert('alert-box', id ? 'User updated successfully.' : 'User created successfully.', 'success');
+                loadUsers();
+            } else {
+                modalAlert('modal-alert', res.message || 'Operation failed.', 'danger');
+            }
+        } catch { modalAlert('modal-alert', 'Server error. Please try again.', 'danger'); }
+        finally { btn.disabled = false; btn.textContent = 'Save User'; }
+    });
+
+    // ── Load users ───────────────────────────────────────────────
+    async function loadUsers() {
+        const tbody = document.getElementById('users-tbody');
+        tbody.innerHTML = '<tr><td colspan="8" class="loading-center"><span class="spinner"></span></td></tr>';
+        try {
+            const users = await UserAPI.getAll();
+            tbody.innerHTML = '';
+            if (!users.length) {
+                tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">👥</div><p>No users found.</p></div></td></tr>';
+                return;
+            }
+            users.forEach(u => {
+                const isSelf = u.username === myUser.username;
+                const tr = document.createElement('tr');
+                if (!u.active) tr.style.opacity = '0.55';
+                tr.innerHTML = `
+                    <td>${u.id}</td>
+                    <td><strong>${u.username}</strong>${isSelf ? ' <span style="font-size:.7rem;color:var(--primary)">(you)</span>' : ''}</td>
+                    <td>${u.fullName}</td>
+                    <td>${u.email || '—'}</td>
+                    <td><span class="role-chip ${u.role}">${u.role}</span></td>
+                    <td>${u.active ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-secondary">Inactive</span>'}</td>
+                    <td>${(u.createdAt || '').substring(0, 10)}</td>
+                    <td>
+                        <div style="display:flex;gap:.3rem;flex-wrap:wrap">
+                            <button class="btn btn-outline btn-sm" onclick="editUser(${u.id})">✏ Edit</button>
+                            <button class="btn btn-info btn-sm" onclick="openChangePwd(${u.id},'${u.username}')">🔑</button>
+                            ${!isSelf ? `
+                            <button class="btn btn-sm ${u.active ? 'btn-warning' : 'btn-success'}" onclick="toggleActive(${u.id},'${u.username}',${u.active})">
+                                ${u.active ? '⏸' : '▶'}
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id},'${u.username}')">🗑</button>
+                            ` : ''}
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch {
+            tbody.innerHTML = '<tr><td colspan="8" class="alert alert-danger">Failed to load users.</td></tr>';
+        }
+    }
+
+    async function editUser(id) {
+        try {
+            const u = await UserAPI.getOne(id);
+            document.getElementById('modal-title').textContent  = 'Edit User — ' + u.username;
+            document.getElementById('edit-user-id').value       = u.id;
+            document.getElementById('f-username').value         = u.username;
+            document.getElementById('f-username').disabled      = true;
+            document.getElementById('f-fullname').value         = u.fullName;
+            document.getElementById('f-email').value            = u.email || '';
+            document.getElementById('f-role').value             = u.role;
+            document.getElementById('pwd-group').style.display  = 'none';
+            clearModalAlert('modal-alert');
+            openModal('user-modal');
+        } catch { showAlert('alert-box', 'Failed to load user details.', 'danger'); }
+    }
+
+    async function toggleActive(id, username, currentlyActive) {
+        if (!confirm((currentlyActive ? 'Deactivate' : 'Activate') + ' user ' + username + '?')) return;
+        const res = await UserAPI.toggleActive(id);
+        if (res.success) { showAlert('alert-box', res.message, 'info'); loadUsers(); }
+        else showAlert('alert-box', res.message || 'Failed.', 'danger');
+    }
+
+    async function deleteUser(id, username) {
+        if (!confirm('Permanently delete user ' + username + '?\nThis cannot be undone.')) return;
+        const res = await UserAPI.delete(id);
+        if (res.success) { showAlert('alert-box', 'User ' + username + ' deleted.', 'warning'); loadUsers(); }
+        else showAlert('alert-box', res.message || 'Failed to delete.', 'danger');
+    }
+
+    function openChangePwd(id, username) {
+        document.getElementById('pwd-user-id').value    = id;
+        document.getElementById('pwd-user-label').textContent = 'Changing password for: ' + username;
+        document.getElementById('new-password').value   = '';
+        clearModalAlert('pwd-modal-alert');
+        openModal('pwd-modal');
+    }
+
+    document.getElementById('pwd-save-btn').addEventListener('click', async () => {
+        const id  = document.getElementById('pwd-user-id').value;
+        const pwd = document.getElementById('new-password').value;
+        if (!pwd || pwd.length < 6) { modalAlert('pwd-modal-alert', 'Password must be at least 6 characters.', 'danger'); return; }
+        const btn = document.getElementById('pwd-save-btn');
+        btn.disabled = true; btn.textContent = 'Saving…';
+        try {
+            const res = await UserAPI.changePassword(id, pwd);
+            if (res.success) { closeModal('pwd-modal'); showAlert('alert-box', 'Password changed successfully.', 'success'); }
+            else modalAlert('pwd-modal-alert', res.message || 'Failed.', 'danger');
+        } catch { modalAlert('pwd-modal-alert', 'Server error.', 'danger'); }
+        finally { btn.disabled = false; btn.textContent = 'Change Password'; }
+    });
+
+    loadUsers();
+</script>
+</body>
+</html>

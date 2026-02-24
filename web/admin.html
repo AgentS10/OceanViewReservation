@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel — Ocean View Resort</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <a class="navbar-brand" href="/dashboard.html"><span class="brand-icon">🌊</span> Ocean View Resort</a>
+    <ul class="navbar-nav">
+        <li><a href="/dashboard.html">🏠 Dashboard</a></li>
+        <li><a href="/reservations.html">📋 Reservations</a></li>
+        <li><a href="/add-reservation.html">➕ New</a></li>
+        <li><a href="/help.html">❓ Help</a></li>
+        <ul id="admin-nav-links" class="navbar-nav" style="display:contents"></ul>
+    </ul>
+    <div class="navbar-right">
+        <div class="navbar-user-info">
+            <div class="navbar-user-name" id="nav-username"></div>
+            <div class="navbar-user-role" id="nav-role"></div>
+        </div>
+        <button id="btn-logout">⏻ Logout</button>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+    <div class="page-header-row">
+        <div class="page-header" style="margin:0">
+            <h1>🛡 Admin Panel</h1>
+            <p>System statistics, active session monitoring, and access control.</p>
+        </div>
+        <div style="display:flex;gap:.5rem">
+            <button class="btn btn-outline btn-sm" id="btn-refresh">🔄 Refresh</button>
+        </div>
+    </div>
+
+    <div id="alert-box" class="alert hidden"></div>
+
+    <!-- Stats row -->
+    <div class="stats-grid" id="stats-grid">
+        <div class="stat-card sc-blue">
+            <div class="stat-icon">📋</div>
+            <div class="stat-label">Total Reservations</div>
+            <div class="stat-value" id="s-total">—</div>
+        </div>
+        <div class="stat-card sc-green">
+            <div class="stat-icon">✅</div>
+            <div class="stat-label">Confirmed</div>
+            <div class="stat-value" id="s-confirmed">—</div>
+        </div>
+        <div class="stat-card sc-teal">
+            <div class="stat-icon">🏨</div>
+            <div class="stat-label">Checked In</div>
+            <div class="stat-value" id="s-checkedin">—</div>
+        </div>
+        <div class="stat-card sc-red">
+            <div class="stat-icon">✕</div>
+            <div class="stat-label">Cancelled</div>
+            <div class="stat-value" id="s-cancelled">—</div>
+        </div>
+        <div class="stat-card sc-purple">
+            <div class="stat-icon">👤</div>
+            <div class="stat-label">Active Sessions</div>
+            <div class="stat-value" id="s-sessions">—</div>
+        </div>
+        <div class="stat-card sc-gold">
+            <div class="stat-icon">💰</div>
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value" id="s-revenue" style="font-size:1rem">—</div>
+        </div>
+    </div>
+
+    <!-- Active Sessions -->
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+            <div class="card-title" style="margin:0;border:none;padding:0">👥 Active Sessions</div>
+            <span class="badge badge-info" id="session-count-badge">0 active</span>
+        </div>
+        <p style="font-size:.82rem;color:var(--grey-700);margin-bottom:1rem">
+            Sessions auto-expire after 8 hours of inactivity. Admins can force-terminate any session.
+        </p>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Role</th>
+                        <th>IP Address</th>
+                        <th>Login Time</th>
+                        <th>Last Active</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="sessions-tbody">
+                    <tr><td colspan="7" class="loading-center"><span class="spinner"></span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Permissions reference -->
+    <div class="card">
+        <div class="card-title">🔐 Role Permissions Reference</div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr><th>Feature</th><th>ADMIN</th><th>MANAGER</th><th>STAFF</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>View Reservations</td><td>✅</td><td>✅</td><td>✅</td></tr>
+                    <tr><td>Create Reservation</td><td>✅</td><td>✅</td><td>✅</td></tr>
+                    <tr><td>Update Reservation</td><td>✅</td><td>✅</td><td>✅</td></tr>
+                    <tr><td>Check In Guest</td><td>✅</td><td>✅</td><td>✅</td></tr>
+                    <tr><td>Check Out Guest</td><td>✅</td><td>✅</td><td>❌</td></tr>
+                    <tr><td>Cancel Reservation</td><td>✅</td><td>✅</td><td>❌</td></tr>
+                    <tr><td>Calculate Bill</td><td>✅</td><td>✅</td><td>✅</td></tr>
+                    <tr><td>View Admin Panel</td><td>✅</td><td>✅</td><td>❌</td></tr>
+                    <tr><td>Manage Users</td><td>✅</td><td>❌</td><td>❌</td></tr>
+                    <tr><td>Terminate Sessions</td><td>✅</td><td>❌</td><td>❌</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script>
+    requireAuth();
+    const role = getRole();
+    if (role !== 'ADMIN' && role !== 'MANAGER') {
+        window.location.href = '/dashboard.html';
+    }
+    renderNavUser();
+
+    const STATUS_BADGE = { CONFIRMED:'badge-success', CHECKED_IN:'badge-info', CHECKED_OUT:'badge-secondary', CANCELLED:'badge-danger' };
+
+    async function loadAll() {
+        loadStats();
+        loadSessions();
+    }
+
+    async function loadStats() {
+        try {
+            const s = await AdminAPI.getStats();
+            document.getElementById('s-total').textContent     = s.totalReservations ?? 0;
+            document.getElementById('s-confirmed').textContent = s.confirmed  ?? 0;
+            document.getElementById('s-checkedin').textContent = s.checkedIn  ?? 0;
+            document.getElementById('s-cancelled').textContent = s.cancelled  ?? 0;
+            document.getElementById('s-sessions').textContent  = s.activeSessions ?? 0;
+            document.getElementById('s-revenue').textContent   = 'LKR ' + Number(s.totalRevenue ?? 0).toLocaleString('en-LK', { maximumFractionDigits: 0 });
+        } catch { /* silent */ }
+    }
+
+    async function loadSessions() {
+        const tbody = document.getElementById('sessions-tbody');
+        tbody.innerHTML = '<tr><td colspan="7" class="loading-center"><span class="spinner"></span></td></tr>';
+        try {
+            const sessions = await AdminAPI.getSessions();
+            const myToken  = localStorage.getItem('token');
+
+            document.getElementById('session-count-badge').textContent = sessions.length + ' active';
+
+            tbody.innerHTML = '';
+            if (!sessions.length) {
+                tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">👤</div><p>No active sessions found.</p></div></td></tr>';
+                return;
+            }
+
+            sessions.forEach(s => {
+                const isSelf = s.token === myToken;
+                const tr = document.createElement('tr');
+                if (isSelf) tr.classList.add('session-self');
+
+                const roleClass = s.role === 'ADMIN' ? 'role-admin' : s.role === 'MANAGER' ? 'role-manager' : 'role-staff';
+
+                tr.innerHTML = `
+                    <td><strong>${s.username}</strong>${isSelf ? ' <span style="font-size:.7rem;color:var(--primary)">(you)</span>' : ''}</td>
+                    <td>${s.fullName}</td>
+                    <td><span class="role-chip ${s.role}">${s.role}</span></td>
+                    <td><code style="font-size:.8rem">${s.ipAddress}</code></td>
+                    <td>${s.loginTime}</td>
+                    <td>${s.lastActive}</td>
+                    <td>
+                        ${!isSelf && role === 'ADMIN'
+                            ? `<button class="btn btn-danger btn-sm" onclick="terminateSession('${s.token}','${s.username}')">⛔ Terminate</button>`
+                            : '<span style="color:var(--grey-400);font-size:.8rem">—</span>'}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch {
+            tbody.innerHTML = '<tr><td colspan="7" class="alert alert-danger">Failed to load sessions.</td></tr>';
+        }
+    }
+
+    async function terminateSession(token, username) {
+        if (!confirm('Force-terminate session for ' + username + '?')) return;
+        try {
+            const res = await AdminAPI.terminateSession(token);
+            if (res.success) {
+                showAlert('alert-box', 'Session terminated for ' + username, 'warning');
+                loadSessions();
+                loadStats();
+            } else {
+                showAlert('alert-box', res.message || 'Failed to terminate session.', 'danger');
+            }
+        } catch {
+            showAlert('alert-box', 'Error communicating with server.', 'danger');
+        }
+    }
+
+    document.getElementById('btn-refresh').addEventListener('click', loadAll);
+
+    // Auto-refresh every 30 seconds
+    loadAll();
+    setInterval(loadAll, 30000);
+</script>
+</body>
+</html>

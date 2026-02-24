@@ -1,0 +1,58 @@
+@startuml OceanViewReservation_SequenceDiagram_Login
+' =========================================================
+' CIS6003 Advanced Programming — WRIT1 Assignment 2025/26
+' Author: Mohamed Subair Mohamed Sajidh
+' Sequence Diagram — User Login Flow
+' =========================================================
+
+skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
+skinparam shadowing false
+
+actor       "User (Browser)"  as USER
+participant "index.html\n(Frontend)"     as HTML
+participant "api.js\nAuthAPI"            as API
+participant "AuthHandler\n(Backend)"     as AUTH   #LightBlue
+participant "UserDAO"                    as UDAO   #LightGreen
+participant "PasswordUtil"               as PWD    #LightYellow
+participant "SessionManager"             as SM     #LightCoral
+database    "MySQL\noceanview_db"        as DB
+
+USER  -> HTML  : Enter username + password\nClick "Sign In"
+HTML  -> API   : AuthAPI.login(username, password)
+API   -> AUTH  : POST /api/auth/login\n{ username, password }
+
+AUTH  -> UDAO  : findByUsername(username)
+UDAO  -> DB    : SELECT * FROM users WHERE username = ?
+DB   --> UDAO  : User row (or null)
+UDAO --> AUTH  : User object
+
+alt User not found
+    AUTH --> API : 401 { success: false, message: "Invalid credentials" }
+    API  --> HTML : Login failed
+    HTML --> USER : Show error alert
+else User found
+    AUTH  -> PWD  : verify(password, user.passwordHash)
+    PWD  --> AUTH : true / false
+
+    alt Password incorrect
+        AUTH --> API : 401 { success: false, message: "Invalid credentials" }
+        API  --> HTML : Login failed
+        HTML --> USER : Show error alert
+    else Password correct
+        alt User inactive
+            AUTH --> API : 403 { success: false, message: "Account deactivated" }
+            API  --> HTML : Account blocked
+            HTML --> USER : Show error alert
+        else User active
+            AUTH  -> SM   : createSession(user, clientIP)
+            SM   --> AUTH : UUID token
+            AUTH  -> DB   : INSERT INTO active_sessions (token, user_id, ...)
+            AUTH --> API  : 200 { success: true, token: "uuid", user: {...} }
+            API  --> HTML : Store token + user in localStorage
+            HTML --> USER : Redirect to /dashboard.html
+        end
+    end
+end
+
+@enduml

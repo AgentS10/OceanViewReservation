@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help — Ocean View Resort</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <a class="navbar-brand" href="/dashboard.html"><span class="brand-icon">🌊</span> Ocean View Resort</a>
+    <ul class="navbar-nav">
+        <li><a href="/dashboard.html">🏠 Dashboard</a></li>
+        <li><a href="/reservations.html">📋 Reservations</a></li>
+        <li><a href="/add-reservation.html">➕ New</a></li>
+        <li><a href="/help.html">❓ Help</a></li>
+        <ul id="admin-nav-links" class="navbar-nav" style="display:contents"></ul>
+    </ul>
+    <div class="navbar-right">
+        <div class="navbar-user-info">
+            <div class="navbar-user-name" id="nav-username"></div>
+            <div class="navbar-user-role" id="nav-role"></div>
+        </div>
+        <button id="btn-logout">⏻ Logout</button>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1>Help &amp; User Guide</h1>
+        <p>Step-by-step instructions for using the Ocean View Resort Reservation System.</p>
+    </div>
+
+    <div class="card">
+        <div id="help-content">
+            <div style="text-align:center;padding:2rem"><span class="spinner"></span></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Room Types &amp; Pricing</div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Room Type</th>
+                        <th>Description</th>
+                        <th>Price / Night (LKR)</th>
+                        <th>Capacity</th>
+                    </tr>
+                </thead>
+                <tbody id="rooms-tbody">
+                    <tr><td colspan="4" style="text-align:center"><span class="spinner"></span></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">Default Login Credentials</div>
+        <table>
+            <thead><tr><th>Role</th><th>Username</th><th>Password</th></tr></thead>
+            <tbody>
+                <tr><td>Administrator</td><td><code>admin</code></td><td><code>Admin@123</code></td></tr>
+                <tr><td>Staff</td><td><code>staff</code></td><td><code>Staff@123</code></td></tr>
+            </tbody>
+        </table>
+        <p style="margin-top:.75rem;font-size:.85rem;color:#6c757d;">
+            ⚠ Change default passwords after first login in a production environment.
+        </p>
+    </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script>
+    requireAuth();
+    renderNavUser();
+
+    HelpAPI.get().then(data => {
+        const container = document.getElementById('help-content');
+        if (!data || !data.sections) {
+            container.innerHTML = '<p style="color:red">Failed to load help content.</p>';
+            return;
+        }
+        container.innerHTML = '<div class="card-title">' + data.title + '</div>' +
+            data.sections.map(s => `
+                <div class="help-section">
+                    <h3>${s.heading}</h3>
+                    <p>${s.content}</p>
+                </div>
+            `).join('');
+    }).catch(() => {
+        document.getElementById('help-content').innerHTML = '<p style="color:red">Server unavailable.</p>';
+    });
+
+    RoomAPI.getAll().then(rooms => {
+        const tbody = document.getElementById('rooms-tbody');
+        tbody.innerHTML = '';
+        rooms.forEach(rt => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${rt.typeName}</strong></td>
+                <td>${rt.description}</td>
+                <td>${Number(rt.pricePerNight).toLocaleString()}</td>
+                <td>${rt.capacity} persons</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Reservation — Ocean View Resort</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <a class="navbar-brand" href="/dashboard.html"><span class="brand-icon">🌊</span> Ocean View Resort</a>
+    <ul class="navbar-nav">
+        <li><a href="/dashboard.html">🏠 Dashboard</a></li>
+        <li><a href="/reservations.html">📋 Reservations</a></li>
+        <li><a href="/add-reservation.html">➕ New</a></li>
+        <li><a href="/help.html">❓ Help</a></li>
+        <ul id="admin-nav-links" class="navbar-nav" style="display:contents"></ul>
+    </ul>
+    <div class="navbar-right">
+        <div class="navbar-user-info">
+            <div class="navbar-user-name" id="nav-username"></div>
+            <div class="navbar-user-role" id="nav-role"></div>
+        </div>
+        <button id="btn-logout">⏻ Logout</button>
+    </div>
+</nav>
+
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1>Reservation Details</h1>
+        <p>Full information for the selected reservation.</p>
+    </div>
+
+    <div id="alert-box" class="alert hidden"></div>
+
+    <div id="reservation-detail">
+        <div style="text-align:center;padding:3rem"><span class="spinner"></span></div>
+    </div>
+</div>
+
+
+<script src="/js/api.js"></script>
+<script src="/js/auth.js"></script>
+<script>
+    requireAuth();
+    renderNavUser();
+
+    const params = new URLSearchParams(window.location.search);
+    const resNum = params.get('num');
+    if (!resNum) { window.location.href = '/reservations.html'; }
+    else { loadDetail(resNum); }
+
+    const STATUS_BADGE = {
+        CONFIRMED: 'badge-success', CHECKED_IN: 'badge-info',
+        CHECKED_OUT: 'badge-secondary', CANCELLED: 'badge-danger'
+    };
+
+    async function loadDetail(num) {
+        document.getElementById('reservation-detail').innerHTML =
+            '<div class="loading-center"><span class="spinner spinner-lg"></span></div>';
+        try {
+            const r = await ReservationAPI.getOne(num);
+            if (!r || !r.reservationNumber) {
+                document.getElementById('reservation-detail').innerHTML =
+                    '<div class="alert alert-danger">Reservation not found: ' + num + '</div>'; return;
+            }
+
+            const role = getRole();
+
+            document.getElementById('reservation-detail').innerHTML = `
+                <div class="card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
+                        <div class="card-title" style="margin:0;border:none;padding:0">
+                            📄 Reservation ${r.reservationNumber}
+                        </div>
+                        <span class="badge ${STATUS_BADGE[r.status] || 'badge-secondary'}">${r.status.replace('_',' ')}</span>
+                    </div>
+
+                    <div class="detail-grid">
+                        <div class="detail-item"><label>Guest Name</label><p>${r.guestName || '—'}</p></div>
+                        <div class="detail-item"><label>Contact Number</label><p>${r.contactNumber || '—'}</p></div>
+                        <div class="detail-item"><label>Address</label><p>${r.address || '—'}</p></div>
+                        <div class="detail-item"><label>Room Type</label><p>${r.roomTypeName || '—'}</p></div>
+                        <div class="detail-item"><label>Check-In Date</label><p>${r.checkInDate || '—'}</p></div>
+                        <div class="detail-item"><label>Check-Out Date</label><p>${r.checkOutDate || '—'}</p></div>
+                        <div class="detail-item"><label>Special Requests</label><p>${r.specialRequests || '—'}</p></div>
+                        <div class="detail-item"><label>Created By</label><p>${r.createdBy || '—'}</p></div>
+                        <div class="detail-item"><label>Created At</label><p>${r.createdAt || '—'}</p></div>
+                        <div class="detail-item"><label>Price / Night</label><p>LKR ${Number(r.pricePerNight||0).toLocaleString()}</p></div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="action-bar">
+                        <a href="/reservations.html" class="btn btn-secondary">← Back</a>
+                        <a href="/bill.html?num=${num}" class="btn btn-info">🧾 Bill</a>
+                        ${r.status === 'CONFIRMED' ?
+                            `<button class="btn btn-success" id="btn-checkin">✅ Check In</button>` : ''}
+                        ${r.status === 'CHECKED_IN' && (role === 'ADMIN' || role === 'MANAGER') ?
+                            `<button class="btn btn-warning" id="btn-checkout">🏁 Check Out</button>` : ''}
+                        ${r.status !== 'CANCELLED' && r.status !== 'CHECKED_OUT' && (role === 'ADMIN' || role === 'MANAGER') ?
+                            `<button class="btn btn-danger" id="btn-cancel">✕ Cancel</button>` : ''}
+                    </div>
+                </div>
+            `;
+
+            wireButtons(r, num);
+        } catch {
+            document.getElementById('reservation-detail').innerHTML =
+                '<div class="alert alert-danger">Error loading reservation details.</div>';
+        }
+    }
+
+    function wireButtons(r, num) {
+        const ciBtn = document.getElementById('btn-checkin');
+        if (ciBtn) {
+            ciBtn.addEventListener('click', async () => {
+                ciBtn.disabled = true; ciBtn.textContent = '…';
+                const res = await StatusAPI.checkIn(num);
+                if (res.success) { showAlert('alert-box', 'Guest checked in successfully.', 'success'); loadDetail(num); }
+                else { showAlert('alert-box', res.message || 'Check-in failed.', 'danger'); ciBtn.disabled = false; ciBtn.textContent = '✅ Check In'; }
+            });
+        }
+        const coBtn = document.getElementById('btn-checkout');
+        if (coBtn) {
+            coBtn.addEventListener('click', async () => {
+                coBtn.disabled = true; coBtn.textContent = '…';
+                const res = await StatusAPI.checkOut(num);
+                if (res.success) { showAlert('alert-box', 'Guest checked out successfully.', 'success'); loadDetail(num); }
+                else { showAlert('alert-box', res.message || 'Check-out failed.', 'danger'); coBtn.disabled = false; coBtn.textContent = '🏁 Check Out'; }
+            });
+        }
+        const caBtn = document.getElementById('btn-cancel');
+        if (caBtn) {
+            caBtn.addEventListener('click', async () => {
+                if (!confirm('Cancel reservation ' + num + '?\nThis cannot be undone.')) return;
+                const res = await ReservationAPI.cancel(num);
+                if (res.success) { showAlert('alert-box', 'Reservation cancelled.', 'warning'); loadDetail(num); }
+                else { showAlert('alert-box', res.message || 'Failed to cancel.', 'danger'); }
+            });
+        }
+    }
+</script>
+</body>
+</html>
