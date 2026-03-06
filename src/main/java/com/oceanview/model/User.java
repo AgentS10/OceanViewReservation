@@ -16,6 +16,7 @@ public class User {
     private String fullName;
     private String email;
     private String role;
+    private String avatarUrl;
     private boolean active = true;
     private String createdAt;
 
@@ -49,15 +50,18 @@ public class User {
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
 
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
+
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
 
     public String toJson() {
         return String.format(
             "{\"id\":%d,\"username\":\"%s\",\"fullName\":\"%s\",\"email\":\"%s\"," +
-            "\"role\":\"%s\",\"active\":%b,\"createdAt\":\"%s\"}",
+            "\"avatarUrl\":\"%s\",\"role\":\"%s\",\"active\":%b,\"createdAt\":\"%s\"}",
             id, esc(username), esc(fullName), esc(email),
-            role, active, esc(createdAt)
+            esc(avatarUrl), role, active, esc(createdAt)
         );
     }
 

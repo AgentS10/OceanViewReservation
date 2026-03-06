@@ -8,24 +8,24 @@
 </head>
 <body>
 
-<nav class="navbar">
-    <a class="navbar-brand" href="/dashboard.html"><span class="brand-icon">🌊</span> Ocean View Resort</a>
-    <ul class="navbar-nav">
-        <li><a href="/dashboard.html">🏠 Dashboard</a></li>
-        <li><a href="/reservations.html">📋 Reservations</a></li>
-        <li><a href="/add-reservation.html">➕ New</a></li>
-        <li><a href="/help.html">❓ Help</a></li>
-        <ul id="admin-nav-links" class="navbar-nav" style="display:contents"></ul>
+<div class="app-layout">
+<aside class="sidebar">
+    <a class="sidebar-brand" href="/dashboard.html"><span class="brand-icon">🏖️</span><div><span class="brand-text">Ocean View Resort</span><span class="brand-sub">Galle, Sri Lanka</span></div></a>
+    <ul class="sidebar-nav">
+        <li><a href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a></li>
+        <li><a href="/reservations.html"><span class="nav-icon">📋</span> Reservations</a></li>
+        <li><a href="/add-reservation.html"><span class="nav-icon">➕</span> New Booking</a></li>
+        <li><a href="/help.html"><span class="nav-icon">📖</span> Help &amp; Guide</a></li>
+        <li class="nav-divider"></li><li id="admin-nav-links"></li>
     </ul>
-    <div class="navbar-right">
-        <div class="navbar-user-info">
-            <div class="navbar-user-name" id="nav-username"></div>
-            <div class="navbar-user-role" id="nav-role"></div>
-        </div>
-        <button id="btn-logout">⏻ Logout</button>
+    <div class="sidebar-bottom">
+        <div class="sidebar-user"><div class="sidebar-user-avatar">👤</div><div class="sidebar-user-info"><div class="sidebar-user-name" id="nav-username"></div><div class="sidebar-user-role" id="nav-role"></div></div></div>
+        <button id="btn-logout">⏻ Sign Out</button>
     </div>
-</nav>
-
+</aside>
+<div class="main-content">
+<div class="bg-slideshow" id="bg-slideshow"></div>
+<div class="floating-emojis"><span class="fe">🌴</span><span class="fe">🌊</span><span class="fe">🐚</span><span class="fe">☀️</span><span class="fe">🏄</span><span class="fe">🐠</span><span class="fe">🦀</span><span class="fe">⛵</span></div>
 <div class="page-wrapper">
     <div class="page-header">
         <h1>Help &amp; User Guide</h1>
@@ -44,6 +44,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>Image</th>
                         <th>Room Type</th>
                         <th>Description</th>
                         <th>Price / Night (LKR)</th>
@@ -51,25 +52,98 @@
                     </tr>
                 </thead>
                 <tbody id="rooms-tbody">
-                    <tr><td colspan="4" style="text-align:center"><span class="spinner"></span></td></tr>
+                    <tr><td colspan="5" style="text-align:center"><span class="spinner"></span></td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
+    <!-- Hotel Amenities & Services -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+        <div class="card">
+            <div class="card-title">🏖️ Resort Amenities</div>
+            <div style="display:flex;flex-direction:column;gap:0.6rem">
+                <div style="display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--grey-200)">
+                    <span style="font-size:1.4rem;width:32px;text-align:center">🏊</span>
+                    <div><strong>Infinity Pool</strong><br><span style="font-size:0.82rem;color:var(--grey-700)">Oceanfront infinity pool open 7 AM – 9 PM daily</span></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--grey-200)">
+                    <span style="font-size:1.4rem;width:32px;text-align:center">🌊</span>
+                    <div><strong>Private Beach Access</strong><br><span style="font-size:0.82rem;color:var(--grey-700)">Direct access to Galle's pristine sandy beach with loungers &amp; umbrellas</span></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--grey-200)">
+                    <span style="font-size:1.4rem;width:32px;text-align:center">💆</span>
+                    <div><strong>Ayurveda Spa</strong><br><span style="font-size:0.82rem;color:var(--grey-700)">Traditional Sri Lankan Ayurveda treatments &amp; wellness packages</span></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--grey-200)">
+                    <span style="font-size:1.4rem;width:32px;text-align:center">🍽️</span>
+                    <div><strong>Restaurant &amp; Bar</strong><br><span style="font-size:0.82rem;color:var(--grey-700)">Sri Lankan &amp; international cuisine, beachside cocktail bar</span></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--grey-200)">
+                    <span style="font-size:1.4rem;width:32px;text-align:center">🏄</span>
+                    <div><strong>Water Sports</strong><br><span style="font-size:0.82rem;color:var(--grey-700)">Surfing, snorkelling, jet skiing &amp; whale watching tours</span></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0">
+                    <span style="font-size:1.4rem;width:32px;text-align:center">🚐</span>
+                    <div><strong>Airport Transfers</strong><br><span style="font-size:0.82rem;color:var(--grey-700)">Bandaranaike International Airport ↔ Resort (approx. 3 hours)</span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📋 Booking Policies &amp; Information</div>
+            <div style="display:flex;flex-direction:column;gap:0.6rem">
+                <div style="display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--grey-200)">
+                    <span style="font-size:1.4rem;width:32px;text-align:center">⏰</span>
+                    <div><strong>Check-in / Check-out</strong><br><span style="font-size:0.82rem;color:var(--grey-700)">Check-in: 2:00 PM &nbsp;|&nbsp; Check-out: 11:00 AM &nbsp;|&nbsp; Early/late available on request</span></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--grey-200)">
+                    <span style="font-size:1.4rem;width:32px;text-align:center">💰</span>
+                    <div><strong>Billing</strong><br><span style="font-size:0.82rem;color:var(--grey-700)">Total = (nights × room rate) + 10% service tax. Payments accepted: cash, card.</span></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--grey-200)">
+                    <span style="font-size:1.4rem;width:32px;text-align:center">🔄</span>
+                    <div><strong>Reservation Status Flow</strong><br><span style="font-size:0.82rem;color:var(--grey-700)">CONFIRMED → CHECKED_IN → CHECKED_OUT (or CANCELLED at any stage)</span></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--grey-200)">
+                    <span style="font-size:1.4rem;width:32px;text-align:center">🆔</span>
+                    <div><strong>Reservation Number</strong><br><span style="font-size:0.82rem;color:var(--grey-700)">Format: RES-YYYYMMDD-XXXX (auto-generated, unique per booking)</span></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0;border-bottom:1px solid var(--grey-200)">
+                    <span style="font-size:1.4rem;width:32px;text-align:center">📞</span>
+                    <div><strong>Contact</strong><br><span style="font-size:0.82rem;color:var(--grey-700)">+94 91 234 5678 &nbsp;|&nbsp; info@oceanviewresort.lk &nbsp;|&nbsp; Galle, Sri Lanka</span></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.7rem;padding:0.55rem 0">
+                    <span style="font-size:1.4rem;width:32px;text-align:center">🛡️</span>
+                    <div><strong>Security</strong><br><span style="font-size:0.82rem;color:var(--grey-700)">SHA-256 password hashing. Sessions auto-expire after 8 hours. All actions are logged.</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="card">
         <div class="card-title">Default Login Credentials</div>
+        <div class="table-wrapper">
         <table>
-            <thead><tr><th>Role</th><th>Username</th><th>Password</th></tr></thead>
+            <thead><tr><th>Role</th><th>Username</th><th>Password</th><th>Full Name</th></tr></thead>
             <tbody>
-                <tr><td>Administrator</td><td><code>admin</code></td><td><code>Admin@123</code></td></tr>
-                <tr><td>Staff</td><td><code>staff</code></td><td><code>Staff@123</code></td></tr>
+                <tr><td><span class="badge badge-warning">Administrator</span></td><td><code>admin</code></td><td><code>Admin@123</code></td><td>Mohamed Subair Mohamed Sajidh</td></tr>
+                <tr><td><span class="badge badge-success">Manager</span></td><td><code>manager</code></td><td><code>Manager@123</code></td><td>Ruwan Karunaratne</td></tr>
+                <tr><td><span class="badge badge-info">Staff</span></td><td><code>staff</code></td><td><code>Staff@123</code></td><td>Chaminda Perera</td></tr>
+                <tr><td><span class="badge badge-info">Staff</span></td><td><code>kavindi</code></td><td><code>Staff@123</code></td><td>Kavindi Senanayake</td></tr>
             </tbody>
         </table>
-        <p style="margin-top:.75rem;font-size:.85rem;color:#6c757d;">
+        </div>
+        <p style="margin-top:.75rem;font-size:.9rem;color:var(--grey-700);">
             ⚠ Change default passwords after first login in a production environment.
         </p>
     </div>
+
+    <footer class="page-footer">
+        <strong>Ocean View Resort</strong> · Room Reservation System v2.0 · CIS6003 Advanced Programming
+    </footer>
+</div>
+</div>
 </div>
 
 <script src="/js/api.js"></script>
@@ -77,6 +151,7 @@
 <script>
     requireAuth();
     renderNavUser();
+    initBgSlideshow();
 
     HelpAPI.get().then(data => {
         const container = document.getElementById('help-content');
@@ -95,15 +170,22 @@
         document.getElementById('help-content').innerHTML = '<p style="color:red">Server unavailable.</p>';
     });
 
+    const roomImages = {
+        'Standard': '/images/room.jpg',
+        'Deluxe':   '/images/double_bed.jpg',
+        'Suite':    '/images/presidential_suite.jpg'
+    };
     RoomAPI.getAll().then(rooms => {
         const tbody = document.getElementById('rooms-tbody');
         tbody.innerHTML = '';
         rooms.forEach(rt => {
+            const img = roomImages[rt.typeName] || '/images/room2.jpg';
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${rt.typeName}</strong></td>
-                <td>${rt.description}</td>
-                <td>${Number(rt.pricePerNight).toLocaleString()}</td>
+                <td style="width:120px"><img src="${img}" alt="${rt.typeName}" style="width:110px;height:70px;object-fit:cover;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.15)"></td>
+                <td><strong style="font-size:1rem">${rt.typeName}</strong></td>
+                <td style="font-size:.92rem">${rt.description}</td>
+                <td style="font-weight:700;font-size:1rem">${Number(rt.pricePerNight).toLocaleString()}</td>
                 <td>${rt.capacity} persons</td>
             `;
             tbody.appendChild(tr);

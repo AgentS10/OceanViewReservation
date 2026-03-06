@@ -63,37 +63,37 @@ async function loadBill(num) {
                         </div>
                     </div>
 
-                    <table style="width:100%;border-collapse:collapse;margin-bottom:1rem;">
+                    <table style="width:100%;border-collapse:collapse;margin-bottom:1rem;font-size:1rem;">
                         <thead>
-                            <tr style="background:#f0f6fc;">
-                                <th style="padding:.6rem;text-align:left;border-bottom:2px solid #dee2e6;">Description</th>
-                                <th style="padding:.6rem;text-align:right;border-bottom:2px solid #dee2e6;">Details</th>
-                                <th style="padding:.6rem;text-align:right;border-bottom:2px solid #dee2e6;">Amount (LKR)</th>
+                            <tr style="background:linear-gradient(135deg,var(--primary-dark),var(--primary));color:#fff;">
+                                <th style="padding:.85rem 1rem;text-align:left;font-size:.9rem;text-transform:uppercase;letter-spacing:.4px;">Description</th>
+                                <th style="padding:.85rem 1rem;text-align:center;font-size:.9rem;text-transform:uppercase;letter-spacing:.4px;">Details</th>
+                                <th style="padding:.85rem 1rem;text-align:right;font-size:.9rem;text-transform:uppercase;letter-spacing:.4px;">Amount (LKR)</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td style="padding:.6rem;border-bottom:1px solid #dee2e6;">${bill.roomTypeName} Room</td>
-                                <td style="padding:.6rem;text-align:right;border-bottom:1px solid #dee2e6;">
+                                <td style="padding:.85rem 1rem;border-bottom:1px solid #dee2e6;font-weight:600;color:#202124;">${bill.roomTypeName} Room</td>
+                                <td style="padding:.85rem 1rem;text-align:center;border-bottom:1px solid #dee2e6;color:#202124;">
                                     ${bill.checkInDate} → ${bill.checkOutDate}<br>
-                                    <small>${bill.numberOfNights} night(s) × LKR ${Number(bill.pricePerNight).toLocaleString()}</small>
+                                    <span style="font-size:.88rem;color:#5f6368;">${bill.numberOfNights} night(s) × LKR ${Number(bill.pricePerNight).toLocaleString()}</span>
                                 </td>
-                                <td style="padding:.6rem;text-align:right;border-bottom:1px solid #dee2e6;">
+                                <td style="padding:.85rem 1rem;text-align:right;border-bottom:1px solid #dee2e6;font-weight:700;color:#202124;font-size:1.05rem;">
                                     ${Number(bill.subtotal).toLocaleString('en-LK', {minimumFractionDigits:2})}
                                 </td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <div class="bill-row">
+                    <div class="bill-row" style="color:#202124;font-weight:500;">
                         <span>Subtotal</span>
-                        <span>LKR ${Number(bill.subtotal).toLocaleString('en-LK', {minimumFractionDigits:2})}</span>
+                        <span style="font-weight:600;">LKR ${Number(bill.subtotal).toLocaleString('en-LK', {minimumFractionDigits:2})}</span>
                     </div>
-                    <div class="bill-row">
+                    <div class="bill-row" style="color:#202124;font-weight:500;">
                         <span>Tax (${(bill.taxRate * 100).toFixed(0)}%)</span>
-                        <span>LKR ${Number(bill.taxAmount).toLocaleString('en-LK', {minimumFractionDigits:2})}</span>
+                        <span style="font-weight:600;">LKR ${Number(bill.taxAmount).toLocaleString('en-LK', {minimumFractionDigits:2})}</span>
                     </div>
-                    <div class="bill-row bill-total">
+                    <div class="bill-row bill-total" style="font-size:1.15rem;padding:1rem 0;border-top:2px solid var(--primary);margin-top:.5rem;">
                         <span>TOTAL AMOUNT DUE</span>
                         <span>LKR ${Number(bill.totalAmount).toLocaleString('en-LK', {minimumFractionDigits:2})}</span>
                     </div>

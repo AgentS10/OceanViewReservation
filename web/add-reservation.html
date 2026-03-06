@@ -8,24 +8,24 @@
 </head>
 <body>
 
-<nav class="navbar">
-    <a class="navbar-brand" href="/dashboard.html"><span class="brand-icon">🌊</span> Ocean View Resort</a>
-    <ul class="navbar-nav">
-        <li><a href="/dashboard.html">🏠 Dashboard</a></li>
-        <li><a href="/reservations.html">📋 Reservations</a></li>
-        <li><a href="/add-reservation.html">➕ New</a></li>
-        <li><a href="/help.html">❓ Help</a></li>
-        <ul id="admin-nav-links" class="navbar-nav" style="display:contents"></ul>
+<div class="app-layout">
+<aside class="sidebar">
+    <a class="sidebar-brand" href="/dashboard.html"><span class="brand-icon">🏖️</span><div><span class="brand-text">Ocean View Resort</span><span class="brand-sub">Galle, Sri Lanka</span></div></a>
+    <ul class="sidebar-nav">
+        <li><a href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a></li>
+        <li><a href="/reservations.html"><span class="nav-icon">📋</span> Reservations</a></li>
+        <li><a href="/add-reservation.html"><span class="nav-icon">➕</span> New Booking</a></li>
+        <li><a href="/help.html"><span class="nav-icon">📖</span> Help &amp; Guide</a></li>
+        <li class="nav-divider"></li><li id="admin-nav-links"></li>
     </ul>
-    <div class="navbar-right">
-        <div class="navbar-user-info">
-            <div class="navbar-user-name" id="nav-username"></div>
-            <div class="navbar-user-role" id="nav-role"></div>
-        </div>
-        <button id="btn-logout">⏻ Logout</button>
+    <div class="sidebar-bottom">
+        <div class="sidebar-user"><div class="sidebar-user-avatar">👤</div><div class="sidebar-user-info"><div class="sidebar-user-name" id="nav-username"></div><div class="sidebar-user-role" id="nav-role"></div></div></div>
+        <button id="btn-logout">⏻ Sign Out</button>
     </div>
-</nav>
-
+</aside>
+<div class="main-content">
+<div class="bg-slideshow" id="bg-slideshow"></div>
+<div class="floating-emojis"><span class="fe">🌴</span><span class="fe">🌊</span><span class="fe">🐚</span><span class="fe">☀️</span><span class="fe">🏄</span><span class="fe">🐠</span><span class="fe">🦀</span><span class="fe">⛵</span></div>
 <div class="page-wrapper">
     <div class="page-header">
         <h1>Add New Reservation</h1>
@@ -56,23 +56,12 @@
                 <input type="text" id="address" class="form-control" placeholder="Guest's home address">
             </div>
 
-            <div class="card-title" style="margin-top:1rem">Booking Details</div>
-
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="roomTypeName">Room Type <span style="color:red">*</span></label>
-                    <select id="roomTypeName" class="form-control" required>
-                        <option value="">— Select Room Type —</option>
-                    </select>
-                    <div class="invalid-feedback">Please select a room type.</div>
-                </div>
-                <div class="form-group">
-                    <label>&nbsp;</label>
-                    <div id="room-info" style="padding:.6rem;background:#f0f6fc;border-radius:6px;font-size:.85rem;color:#495057;min-height:40px;">
-                        Select a room type to see details.
-                    </div>
-                </div>
+            <div class="card-title" style="margin-top:1rem">Select Room Type <span style="color:red">*</span></div>
+            <input type="hidden" id="roomTypeName" required>
+            <div class="room-cards" id="room-cards">
+                <div style="text-align:center;padding:2rem;grid-column:1/-1"><span class="spinner"></span> Loading rooms...</div>
             </div>
+            <div class="invalid-feedback" id="room-error" style="display:none">Please select a room type.</div>
 
             <div class="form-row">
                 <div class="form-group">
@@ -99,32 +88,49 @@
             </div>
         </form>
     </div>
+
+    <footer class="page-footer">
+        <strong>Ocean View Resort</strong> · Room Reservation System v2.0 · CIS6003 Advanced Programming
+    </footer>
+</div>
+</div>
 </div>
 
 <script src="/js/api.js"></script>
 <script src="/js/auth.js"></script>
 <script>
-    // Show room info when selection changes
+    initBgSlideshow();
+    const roomImages = { 'Standard': '/images/room.jpg', 'Deluxe': '/images/double_bed.jpg', 'Suite': '/images/presidential_suite.jpg' };
+
     document.addEventListener('DOMContentLoaded', () => {
         RoomAPI.getAll().then(rooms => {
-            const sel = document.getElementById('roomTypeName');
-            const info = document.getElementById('room-info');
+            const container = document.getElementById('room-cards');
+            const hiddenInput = document.getElementById('roomTypeName');
+            container.innerHTML = '';
             rooms.forEach(rt => {
-                const opt = document.createElement('option');
-                opt.value = rt.typeName;
-                opt.dataset.desc  = rt.description;
-                opt.dataset.price = rt.pricePerNight;
-                opt.dataset.cap   = rt.capacity;
-                opt.textContent   = rt.typeName + '  (LKR ' + Number(rt.pricePerNight).toLocaleString() + '/night)';
-                sel.appendChild(opt);
-            });
-            sel.addEventListener('change', () => {
-                const opt = sel.options[sel.selectedIndex];
-                if (opt.value) {
-                    info.innerHTML = `<strong>${opt.value}</strong> &nbsp;|&nbsp; LKR ${Number(opt.dataset.price).toLocaleString()}/night &nbsp;|&nbsp; Capacity: ${opt.dataset.cap}<br><small>${opt.dataset.desc}</small>`;
-                } else {
-                    info.textContent = 'Select a room type to see details.';
-                }
+                const img = roomImages[rt.typeName] || '/images/room2.jpg';
+                const card = document.createElement('div');
+                card.className = 'room-card';
+                card.dataset.value = rt.typeName;
+                card.innerHTML = `
+                    <div class="room-card-check">✓</div>
+                    <img class="room-card-img" src="${img}" alt="${rt.typeName}">
+                    <div class="room-card-body">
+                        <div class="room-card-name">${rt.typeName}</div>
+                        <div class="room-card-desc">${rt.description}</div>
+                        <div class="room-card-meta">
+                            <span class="room-card-price">LKR ${Number(rt.pricePerNight).toLocaleString()}/night</span>
+                            <span class="room-card-cap">👤 ${rt.capacity} persons</span>
+                        </div>
+                    </div>
+                `;
+                card.addEventListener('click', () => {
+                    container.querySelectorAll('.room-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    hiddenInput.value = rt.typeName;
+                    document.getElementById('room-error').style.display = 'none';
+                });
+                container.appendChild(card);
             });
         });
         const today = new Date().toISOString().split('T')[0];

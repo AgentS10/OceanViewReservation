@@ -7,110 +7,144 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-
-<nav class="navbar">
-    <a class="navbar-brand" href="/dashboard.html"><span class="brand-icon">🌊</span> Ocean View Resort</a>
-    <ul class="navbar-nav">
-        <li><a href="/dashboard.html">🏠 Dashboard</a></li>
-        <li><a href="/reservations.html">📋 Reservations</a></li>
-        <li><a href="/add-reservation.html">➕ New</a></li>
-        <li><a href="/help.html">❓ Help</a></li>
-        <ul id="admin-nav-links" class="navbar-nav" style="display:contents"></ul>
-    </ul>
-    <div class="navbar-right">
-        <div class="navbar-user-info">
-            <div class="navbar-user-name" id="nav-username"></div>
-            <div class="navbar-user-role" id="nav-role"></div>
-        </div>
-        <button id="btn-logout">⏻ Logout</button>
-    </div>
-</nav>
-
-<div class="page-wrapper">
-    <div class="page-header">
-        <h1>Dashboard</h1>
-        <p>Real-time overview of reservations, sessions and revenue.</p>
-    </div>
-
-    <div class="stats-grid">
-        <div class="stat-card sc-blue">
-            <div class="stat-icon">📋</div>
-            <div class="stat-label">Total Bookings</div>
-            <div class="stat-value" id="stat-total">—</div>
-        </div>
-        <div class="stat-card sc-green">
-            <div class="stat-icon">✅</div>
-            <div class="stat-label">Confirmed</div>
-            <div class="stat-value" id="stat-confirmed">—</div>
-        </div>
-        <div class="stat-card sc-teal">
-            <div class="stat-icon">🏨</div>
-            <div class="stat-label">Checked In</div>
-            <div class="stat-value" id="stat-checkedin">—</div>
-        </div>
-        <div class="stat-card sc-red">
-            <div class="stat-icon">✕</div>
-            <div class="stat-label">Cancelled</div>
-            <div class="stat-value" id="stat-cancelled">—</div>
-        </div>
-        <div class="stat-card sc-purple">
-            <div class="stat-icon">👤</div>
-            <div class="stat-label">Active Sessions</div>
-            <div class="stat-value" id="stat-sessions">—</div>
-        </div>
-        <div class="stat-card sc-gold">
-            <div class="stat-icon">💰</div>
-            <div class="stat-label">Total Revenue</div>
-            <div class="stat-value" id="stat-revenue" style="font-size:1.1rem">—</div>
-        </div>
-    </div>
-
-    <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-            <div class="card-title" style="margin:0;border:none;padding:0">📅 Recent Reservations</div>
-            <a href="/reservations.html" class="btn btn-outline btn-sm">View All →</a>
-        </div>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Reservation #</th>
-                        <th>Guest Name</th>
-                        <th>Room Type</th>
-                        <th>Check-In</th>
-                        <th>Check-Out</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody id="recent-tbody">
-                    <tr><td colspan="7" class="loading-center"><span class="spinner"></span></td></tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="quick-grid">
-        <a class="quick-card" href="/add-reservation.html">
-            <div class="qc-icon">➕</div>
-            <div class="qc-title">New Reservation</div>
-            <div class="qc-desc">Register a new guest and room booking.</div>
+<div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <a class="sidebar-brand" href="/dashboard.html">
+            <span class="brand-icon">🏖️</span>
+            <div><span class="brand-text">Ocean View Resort</span><span class="brand-sub">Galle, Sri Lanka</span></div>
         </a>
-        <a class="quick-card" href="/reservations.html">
-            <div class="qc-icon">📋</div>
-            <div class="qc-title">All Reservations</div>
-            <div class="qc-desc">Browse, search and manage all bookings.</div>
-        </a>
-        <a class="quick-card" href="/admin.html">
-            <div class="qc-icon">🛡</div>
-            <div class="qc-title">Admin Panel</div>
-            <div class="qc-desc">Monitor active sessions and system stats.</div>
-        </a>
-        <a class="quick-card" href="/help.html">
-            <div class="qc-icon">❓</div>
-            <div class="qc-title">Help &amp; Guide</div>
-            <div class="qc-desc">Learn how to use the reservation system.</div>
-        </a>
+        <ul class="sidebar-nav">
+            <li><a href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a></li>
+            <li><a href="/reservations.html"><span class="nav-icon">📋</span> Reservations</a></li>
+            <li><a href="/add-reservation.html"><span class="nav-icon">➕</span> New Booking</a></li>
+            <li><a href="/help.html"><span class="nav-icon">📖</span> Help &amp; Guide</a></li>
+            <li class="nav-divider"></li>
+            <li id="admin-nav-links"></li>
+        </ul>
+        <div class="sidebar-bottom">
+            <div class="sidebar-user">
+                <div class="sidebar-user-avatar">👤</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name" id="nav-username"></div>
+                    <div class="sidebar-user-role" id="nav-role"></div>
+                </div>
+            </div>
+            <button id="btn-logout">⏻ Sign Out</button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="bg-slideshow" id="bg-slideshow"></div>
+        <div class="floating-emojis">
+            <span class="fe">🌴</span><span class="fe">🌊</span><span class="fe">🐚</span>
+            <span class="fe">☀️</span><span class="fe">🏄</span><span class="fe">🐠</span>
+            <span class="fe">🦀</span><span class="fe">⛵</span>
+        </div>
+
+        <div class="page-wrapper">
+            <div class="welcome-banner" id="welcome-banner">
+                <h2 id="wb-greeting">Welcome back</h2>
+                <p>Manage reservations, monitor sessions, and track revenue — all in one place.</p>
+                <div class="wb-time" id="wb-time"></div>
+            </div>
+
+            <div class="page-header">
+                <h1>Dashboard</h1>
+                <p>Real-time overview of reservations, sessions and revenue.</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card sc-blue">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-label">Total Bookings</div>
+                    <div class="stat-value" id="stat-total">—</div>
+                </div>
+                <div class="stat-card sc-green">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-label">Confirmed</div>
+                    <div class="stat-value" id="stat-confirmed">—</div>
+                </div>
+                <div class="stat-card sc-teal">
+                    <div class="stat-icon">🏨</div>
+                    <div class="stat-label">Checked In</div>
+                    <div class="stat-value" id="stat-checkedin">—</div>
+                </div>
+                <div class="stat-card sc-red">
+                    <div class="stat-icon">✕</div>
+                    <div class="stat-label">Cancelled</div>
+                    <div class="stat-value" id="stat-cancelled">—</div>
+                </div>
+                <div class="stat-card sc-purple">
+                    <div class="stat-icon">👤</div>
+                    <div class="stat-label">Active Sessions</div>
+                    <div class="stat-value" id="stat-sessions">—</div>
+                </div>
+                <div class="stat-card sc-gold">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-label">Total Revenue</div>
+                    <div class="stat-value" id="stat-revenue" style="font-size:1.1rem">—</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+                    <div class="card-title" style="margin:0;border:none;padding:0">📅 Recent Reservations</div>
+                    <a href="/reservations.html" class="btn btn-outline btn-sm">View All →</a>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Reservation #</th>
+                                <th>Guest Name</th>
+                                <th>Room Type</th>
+                                <th>Check-In</th>
+                                <th>Check-Out</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-tbody">
+                            <tr><td colspan="7" class="loading-center"><span class="spinner"></span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="quick-grid">
+                <a class="quick-card" href="/add-reservation.html">
+                    <div class="qc-icon">🛏️</div>
+                    <div class="qc-title">New Reservation</div>
+                    <div class="qc-desc">Register a new guest, select room type, set check-in &amp; check-out dates.</div>
+                </a>
+                <a class="quick-card" href="/reservations.html">
+                    <div class="qc-icon">📋</div>
+                    <div class="qc-title">All Reservations</div>
+                    <div class="qc-desc">Browse, search by guest name, view details, check-in / check-out guests.</div>
+                </a>
+                <a class="quick-card" href="/admin.html" id="qc-admin">
+                    <div class="qc-icon">📊</div>
+                    <div class="qc-title">Admin Panel</div>
+                    <div class="qc-desc">Monitor active sessions, view system statistics, manage access control.</div>
+                </a>
+                <a class="quick-card" href="/users.html" id="qc-users">
+                    <div class="qc-icon">👥</div>
+                    <div class="qc-title">User Management</div>
+                    <div class="qc-desc">Add, edit, deactivate staff accounts and manage role assignments.</div>
+                </a>
+                <a class="quick-card" href="/help.html">
+                    <div class="qc-icon">🏖️</div>
+                    <div class="qc-title">Help &amp; Guide</div>
+                    <div class="qc-desc">Step-by-step instructions for new staff, room types &amp; pricing info.</div>
+                </a>
+            </div>
+
+            <footer class="page-footer">
+                <strong>Ocean View Resort</strong> · Room Reservation System v2.0 · CIS6003 Advanced Programming
+            </footer>
+        </div>
     </div>
 </div>
 

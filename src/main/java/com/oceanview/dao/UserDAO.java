@@ -26,7 +26,7 @@ public class UserDAO {
 
     public List<User> findAll() {
         List<User> list = new ArrayList<>();
-        String sql = "SELECT id,username,password_hash,full_name,email,role,is_active,created_at FROM users ORDER BY id";
+        String sql = "SELECT id,username,password_hash,full_name,email,avatar_url,role,is_active,created_at FROM users ORDER BY id";
         try (Statement st = getConn().createStatement(); ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) list.add(map(rs));
         } catch (SQLException e) {
@@ -36,7 +36,7 @@ public class UserDAO {
     }
 
     public User findById(int id) {
-        String sql = "SELECT id,username,password_hash,full_name,email,role,is_active,created_at FROM users WHERE id=?";
+        String sql = "SELECT id,username,password_hash,full_name,email,avatar_url,role,is_active,created_at FROM users WHERE id=?";
         try (PreparedStatement ps = getConn().prepareStatement(sql)) {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) { if (rs.next()) return map(rs); }
@@ -47,7 +47,7 @@ public class UserDAO {
     }
 
     public User findByUsername(String username) {
-        String sql = "SELECT id,username,password_hash,full_name,email,role,is_active,created_at FROM users WHERE username=?";
+        String sql = "SELECT id,username,password_hash,full_name,email,avatar_url,role,is_active,created_at FROM users WHERE username=?";
         try (PreparedStatement ps = getConn().prepareStatement(sql)) {
             ps.setString(1, username);
             try (ResultSet rs = ps.executeQuery()) { if (rs.next()) return map(rs); }
@@ -84,13 +84,14 @@ public class UserDAO {
     // ── Update ──────────────────────────────────────────────────
 
     public boolean update(User user) {
-        String sql = "UPDATE users SET full_name=?, email=?, role=?, is_active=? WHERE id=?";
+        String sql = "UPDATE users SET full_name=?, email=?, role=?, is_active=?, avatar_url=? WHERE id=?";
         try (PreparedStatement ps = getConn().prepareStatement(sql)) {
             ps.setString(1, user.getFullName());
             ps.setString(2, user.getEmail());
             ps.setString(3, user.getRole());
             ps.setInt(4, user.isActive() ? 1 : 0);
-            ps.setInt(5, user.getId());
+            ps.setString(5, user.getAvatarUrl());
+            ps.setInt(6, user.getId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("[UserDAO] update error: " + e.getMessage());
@@ -122,6 +123,18 @@ public class UserDAO {
         }
     }
 
+    public boolean updateAvatar(int userId, String avatarUrl) {
+        String sql = "UPDATE users SET avatar_url=? WHERE id=?";
+        try (PreparedStatement ps = getConn().prepareStatement(sql)) {
+            ps.setString(1, avatarUrl);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("[UserDAO] updateAvatar error: " + e.getMessage());
+            return false;
+        }
+    }
+
     // ── Delete ──────────────────────────────────────────────────
 
     public boolean delete(int id) {
@@ -144,6 +157,7 @@ public class UserDAO {
         u.setPasswordHash(rs.getString("password_hash"));
         u.setFullName(rs.getString("full_name"));
         u.setEmail(rs.getString("email"));
+        u.setAvatarUrl(rs.getString("avatar_url"));
         u.setRole(rs.getString("role"));
         u.setActive(rs.getInt("is_active") == 1);
         u.setCreatedAt(rs.getString("created_at"));

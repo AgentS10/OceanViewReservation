@@ -8,25 +8,41 @@
 </head>
 <body>
 <div class="login-page">
-    <!-- Hero panel -->
+    <!-- Hero panel — Beach themed with image slideshow -->
     <div class="login-hero">
-        <div class="hero-icon">🌊</div>
-        <h1>Ocean View Resort</h1>
-        <p>Streamline every stay with our intelligent room reservation system — from booking to checkout.</p>
-        <ul class="hero-features">
-            <li>✅ Real-time reservation management</li>
-            <li>👥 Role-based access control</li>
-            <li>🧾 Automatic bill calculation</li>
-            <li>🛡 Active session monitoring</li>
-            <li>📊 Live dashboard analytics</li>
-        </ul>
+        <div class="hero-slideshow" id="hero-slideshow"></div>
+        <div class="hero-bg-shapes">
+            <div class="circle c1"></div>
+            <div class="circle c2"></div>
+            <div class="circle c3"></div>
+        </div>
+        <div class="login-wave"></div>
+        <div class="login-wave-2"></div>
+        <div class="login-wave-3"></div>
+
+        <div class="hero-content">
+            <span class="hero-icon">  🏖️ </span>
+            <h1>Ocean View Resort</h1>
+            <p class="hero-tagline">
+                A beachside paradise in Galle, Sri Lanka — streamline every stay with our intelligent room reservation system.
+            </p>
+            <div class="hero-location">📍 Galle, Sri Lanka &nbsp;·&nbsp; 🌊 Beachfront Property</div>
+
+            <ul class="hero-features">
+                <li><span class="feature-icon">🏨</span> Real-time reservation management</li>
+                <li><span class="feature-icon">👥</span> Multi-role access control (Admin · Manager · Staff)</li>
+                <li><span class="feature-icon">🧾</span> Automatic bill calculation with tax</li>
+                <li><span class="feature-icon">📊</span> Live dashboard analytics &amp; revenue tracking</li>
+                <li><span class="feature-icon">🕵️</span> Active session monitoring &amp; audit log</li>
+            </ul>
+        </div>
     </div>
 
     <!-- Login panel -->
     <div class="login-panel">
         <div class="login-box">
             <div class="login-logo">
-                <span class="logo-icon">🌊</span>
+                <span class="logo-icon">🏨</span>
                 <h2>Welcome back</h2>
                 <p>Sign in to the reservation system</p>
             </div>
@@ -36,32 +52,57 @@
             <form id="login-form" autocomplete="off" novalidate>
                 <div class="form-group">
                     <label for="username">Username</label>
-                    <input type="text" id="username" class="form-control"
-                           placeholder="your.username" required autofocus>
+                    <div class="input-icon-wrap">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="username" class="form-control"
+                               placeholder="Enter your username" required autofocus>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" class="form-control"
-                           placeholder="••••••••" required>
+                    <div class="input-icon-wrap">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="password" class="form-control"
+                               placeholder="Enter your password" required>
+                    </div>
                 </div>
-                <div style="margin-top:1.3rem">
-                    <button type="submit" id="btn-login" class="btn btn-primary btn-block btn-lg">Sign In</button>
+                <div style="margin-top:1.5rem">
+                    <button type="submit" id="btn-login" class="btn btn-primary btn-block btn-lg">
+                        🔑 Sign In
+                    </button>
                 </div>
             </form>
 
-            <div class="cred-hint">
-                <strong>Default credentials</strong><br><br>
-                <table>
-                    <tr><th>Role</th><th>Username</th><th>Password</th></tr>
-                    <tr><td>Admin</td><td><code>admin</code></td><td><code>Admin@123</code></td></tr>
-                    <tr><td>Manager</td><td><code>manager</code></td><td><code>Manager@123</code></td></tr>
-                    <tr><td>Staff</td><td><code>staff</code></td><td><code>Staff@123</code></td></tr>
-                </table>
-            </div>
         </div>
     </div>
 </div>
 <script src="/js/api.js"></script>
 <script src="/js/auth.js"></script>
+<script>
+// Login hero image slideshow
+(function() {
+    const container = document.getElementById('hero-slideshow');
+    if (!container) return;
+    const images = [
+        '/images/beach_view.jpg', '/images/hotel_front.jpg', '/images/pool.jpg',
+        '/images/aerial_view.jpg', '/images/Dining_area.jpg', '/images/relaxing_area.jpg',
+        '/images/night time_pool.jpg', '/images/presidential_suite.jpg',
+        '/images/room.jpg', '/images/room2.jpg', '/images/double_bed.jpg'
+    ];
+    images.forEach((src, i) => {
+        const div = document.createElement('div');
+        div.className = 'hs-slide' + (i === 0 ? ' active' : '');
+        div.style.backgroundImage = 'url(' + src + ')';
+        container.appendChild(div);
+    });
+    let current = 0;
+    setInterval(() => {
+        const slides = container.querySelectorAll('.hs-slide');
+        slides[current].classList.remove('active');
+        current = (current + 1) % slides.length;
+        slides[current].classList.add('active');
+    }, 5000);
+})();
+</script>
 </body>
 </html>

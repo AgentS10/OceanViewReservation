@@ -4,6 +4,18 @@
 
 requireAuth();
 renderNavUser();
+initBgSlideshow();
+
+// Welcome banner
+(function() {
+    const user = getUser();
+    const h = new Date().getHours();
+    const greet = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+    const el = document.getElementById('wb-greeting');
+    if (el) el.textContent = greet + ', ' + (user.fullName || user.username || 'User');
+    const timeEl = document.getElementById('wb-time');
+    if (timeEl) timeEl.textContent = new Date().toLocaleDateString('en-LK', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+})();
 
 async function loadDashboard() {
     try {
@@ -56,5 +68,19 @@ function badgeHtml(status) {
     const map = { CONFIRMED:'badge-success', CHECKED_IN:'badge-info', CHECKED_OUT:'badge-secondary', CANCELLED:'badge-danger' };
     return `<span class="badge ${map[status] || 'badge-secondary'}">${status.replace('_',' ')}</span>`;
 }
+
+// Hide admin-only quick cards for STAFF
+(function() {
+    const role = getRole();
+    if (role === 'STAFF') {
+        const qcAdmin = document.getElementById('qc-admin');
+        const qcUsers = document.getElementById('qc-users');
+        if (qcAdmin) qcAdmin.style.display = 'none';
+        if (qcUsers) qcUsers.style.display = 'none';
+    } else if (role === 'MANAGER') {
+        const qcUsers = document.getElementById('qc-users');
+        if (qcUsers) qcUsers.style.display = 'none';
+    }
+})();
 
 loadDashboard();

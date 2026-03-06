@@ -8,24 +8,24 @@
 </head>
 <body>
 
-<nav class="navbar">
-    <a class="navbar-brand" href="/dashboard.html"><span class="brand-icon">🌊</span> Ocean View Resort</a>
-    <ul class="navbar-nav">
-        <li><a href="/dashboard.html">🏠 Dashboard</a></li>
-        <li><a href="/reservations.html">📋 Reservations</a></li>
-        <li><a href="/add-reservation.html">➕ New</a></li>
-        <li><a href="/help.html">❓ Help</a></li>
-        <ul id="admin-nav-links" class="navbar-nav" style="display:contents"></ul>
+<div class="app-layout">
+<aside class="sidebar">
+    <a class="sidebar-brand" href="/dashboard.html"><span class="brand-icon">🏖️</span><div><span class="brand-text">Ocean View Resort</span><span class="brand-sub">Galle, Sri Lanka</span></div></a>
+    <ul class="sidebar-nav">
+        <li><a href="/dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a></li>
+        <li><a href="/reservations.html"><span class="nav-icon">📋</span> Reservations</a></li>
+        <li><a href="/add-reservation.html"><span class="nav-icon">➕</span> New Booking</a></li>
+        <li><a href="/help.html"><span class="nav-icon">📖</span> Help &amp; Guide</a></li>
+        <li class="nav-divider"></li><li id="admin-nav-links"></li>
     </ul>
-    <div class="navbar-right">
-        <div class="navbar-user-info">
-            <div class="navbar-user-name" id="nav-username"></div>
-            <div class="navbar-user-role" id="nav-role"></div>
-        </div>
-        <button id="btn-logout">⏻ Logout</button>
+    <div class="sidebar-bottom">
+        <div class="sidebar-user"><div class="sidebar-user-avatar">👤</div><div class="sidebar-user-info"><div class="sidebar-user-name" id="nav-username"></div><div class="sidebar-user-role" id="nav-role"></div></div></div>
+        <button id="btn-logout">⏻ Sign Out</button>
     </div>
-</nav>
-
+</aside>
+<div class="main-content">
+<div class="bg-slideshow" id="bg-slideshow"></div>
+<div class="floating-emojis"><span class="fe">🌴</span><span class="fe">🌊</span><span class="fe">🐚</span><span class="fe">☀️</span><span class="fe">🏄</span><span class="fe">🐠</span><span class="fe">🦀</span><span class="fe">⛵</span></div>
 <div class="page-wrapper">
     <div class="page-header-row">
         <div class="page-header" style="margin:0">
@@ -58,6 +58,102 @@
             </table>
         </div>
     </div>
+
+    <!-- User Stats -->
+    <div class="stats-grid" id="user-stats" style="margin-top:0.5rem">
+        <div class="stat-card sc-gold">
+            <div class="stat-icon">👑</div>
+            <div class="stat-label">Administrators</div>
+            <div class="stat-value" id="ustat-admin">—</div>
+        </div>
+        <div class="stat-card sc-green">
+            <div class="stat-icon">📋</div>
+            <div class="stat-label">Managers</div>
+            <div class="stat-value" id="ustat-manager">—</div>
+        </div>
+        <div class="stat-card sc-blue">
+            <div class="stat-icon">🏨</div>
+            <div class="stat-label">Staff Members</div>
+            <div class="stat-value" id="ustat-staff">—</div>
+        </div>
+        <div class="stat-card sc-purple">
+            <div class="stat-icon">👥</div>
+            <div class="stat-label">Total Users</div>
+            <div class="stat-value" id="ustat-total">—</div>
+        </div>
+    </div>
+
+    <!-- RBAC Reference + Hotel Staff Info -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+        <div class="card">
+            <div class="card-title">🔐 Role-Based Access Control</div>
+            <p style="font-size:0.9rem;color:var(--grey-700);margin-bottom:1rem">Each role has specific permissions within the reservation system:</p>
+            <div style="display:flex;flex-direction:column;gap:0.85rem">
+                <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.8rem;background:var(--warning-light);border-radius:var(--radius);border-left:4px solid var(--warning)">
+                    <span style="font-size:1.5rem">👑</span>
+                    <div>
+                        <strong style="color:var(--dark)">Administrator</strong>
+                        <p style="font-size:0.82rem;color:var(--grey-700);margin-top:0.15rem">Full system access — manage users, monitor sessions, CRUD all reservations, view audit log, terminate sessions.</p>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.8rem;background:var(--success-light);border-radius:var(--radius);border-left:4px solid var(--success)">
+                    <span style="font-size:1.5rem">📋</span>
+                    <div>
+                        <strong style="color:var(--dark)">Manager</strong>
+                        <p style="font-size:0.82rem;color:var(--grey-700);margin-top:0.15rem">All reservation operations — create, update, check-in, check-out, cancel. Access admin dashboard and statistics.</p>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.8rem;background:var(--info-light);border-radius:var(--radius);border-left:4px solid var(--info)">
+                    <span style="font-size:1.5rem">🏨</span>
+                    <div>
+                        <strong style="color:var(--dark)">Staff</strong>
+                        <p style="font-size:0.82rem;color:var(--grey-700);margin-top:0.15rem">Front desk operations — create reservations, check-in guests, view bookings, calculate bills. Cannot cancel or check-out.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🏖️ Ocean View Resort — Staff Guidelines</div>
+            <p style="font-size:0.9rem;color:var(--grey-700);margin-bottom:1rem">Important information for all resort staff members:</p>
+            <div style="display:flex;flex-direction:column;gap:0.7rem;font-size:0.88rem;color:var(--grey-700)">
+                <div style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0;border-bottom:1px solid var(--grey-200)">
+                    <span style="font-size:1.2rem">📍</span>
+                    <span><strong>Location:</strong> Galle, Sri Lanka — Beachfront property with direct ocean access</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0;border-bottom:1px solid var(--grey-200)">
+                    <span style="font-size:1.2rem">🛏️</span>
+                    <span><strong>Room Types:</strong> Standard (LKR 5,000) · Deluxe (LKR 8,000) · Suite (LKR 15,000)</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0;border-bottom:1px solid var(--grey-200)">
+                    <span style="font-size:1.2rem">⏰</span>
+                    <span><strong>Check-in:</strong> 2:00 PM &nbsp;|&nbsp; <strong>Check-out:</strong> 11:00 AM</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0;border-bottom:1px solid var(--grey-200)">
+                    <span style="font-size:1.2rem">💰</span>
+                    <span><strong>Tax:</strong> 10% service charge applied to all bills</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0;border-bottom:1px solid var(--grey-200)">
+                    <span style="font-size:1.2rem">🌊</span>
+                    <span><strong>Amenities:</strong> Private beach, infinity pool, spa, restaurant, water sports</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0;border-bottom:1px solid var(--grey-200)">
+                    <span style="font-size:1.2rem">📞</span>
+                    <span><strong>Contact:</strong> +94 91 234 5678 &nbsp;|&nbsp; info@oceanviewresort.lk</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.6rem;padding:0.6rem 0">
+                    <span style="font-size:1.2rem">🔒</span>
+                    <span><strong>Security:</strong> Change default passwords after first login. Sessions expire after 8 hours.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        <strong>Ocean View Resort</strong> · Room Reservation System v2.0 · CIS6003 Advanced Programming
+    </footer>
+</div>
+</div>
 </div>
 
 <!-- Add / Edit User Modal -->
@@ -73,7 +169,7 @@
             <div class="form-row">
                 <div class="form-group">
                     <label for="f-username">Username</label>
-                    <input type="text" id="f-username" class="form-control" placeholder="e.g. john_doe">
+                    <input type="text" id="f-username" class="form-control" placeholder="e.g. Sajidh_Subair">
                     <div class="invalid-feedback">Username required (3–30 chars, alphanumeric/_)</div>
                 </div>
                 <div class="form-group">
@@ -87,12 +183,12 @@
             </div>
             <div class="form-group">
                 <label for="f-fullname">Full Name</label>
-                <input type="text" id="f-fullname" class="form-control" placeholder="e.g. John Doe">
+                <input type="text" id="f-fullname" class="form-control" placeholder="e.g. Sajidh Subair">
                 <div class="invalid-feedback">Full name is required.</div>
             </div>
             <div class="form-group">
                 <label for="f-email">Email</label>
-                <input type="email" id="f-email" class="form-control" placeholder="e.g. john@oceanviewresort.lk">
+                <input type="email" id="f-email" class="form-control" placeholder="e.g. sajidh@oceanviewresort.lk">
             </div>
             <div class="form-group" id="pwd-group">
                 <label for="f-password">Password <span style="color:var(--danger)">*</span></label>
@@ -136,6 +232,7 @@
     requireAuth();
     if (getRole() !== 'ADMIN') { window.location.href = '/dashboard.html'; }
     renderNavUser();
+    initBgSlideshow();
 
     const myUser = getUser();
 
@@ -199,7 +296,18 @@
             if (res.success) {
                 closeModal('user-modal');
                 showAlert('alert-box', id ? 'User updated successfully.' : 'User created successfully.', 'success');
-                loadUsers();
+                if (id && res.user) {
+                    const me = getUser();
+                    if (me && String(me.id) === String(id)) {
+                        const updated = JSON.parse(res.user);
+                        me.fullName = updated.fullName || me.fullName;
+                        me.email    = updated.email    || me.email;
+                        me.role     = updated.role     || me.role;
+                        localStorage.setItem('user', JSON.stringify(me));
+                        renderNavUser();
+                    }
+                }
+                loadUsers().then(() => updateUserStats());
             } else {
                 modalAlert('modal-alert', res.message || 'Operation failed.', 'danger');
             }
@@ -222,9 +330,20 @@
                 const isSelf = u.username === myUser.username;
                 const tr = document.createElement('tr');
                 if (!u.active) tr.style.opacity = '0.55';
+                const avatarHtml = u.avatarUrl
+                    ? `<img src="${u.avatarUrl}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">`
+                    : `<div style="width:36px;height:36px;border-radius:50%;background:var(--grey-200);display:flex;align-items:center;justify-content:center;font-size:1.1rem">👤</div>`;
                 tr.innerHTML = `
                     <td>${u.id}</td>
-                    <td><strong>${u.username}</strong>${isSelf ? ' <span style="font-size:.7rem;color:var(--primary)">(you)</span>' : ''}</td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:.6rem">
+                            <label style="cursor:pointer;flex-shrink:0" title="Click to change avatar">
+                                ${avatarHtml}
+                                <input type="file" accept="image/*" style="display:none" onchange="uploadAvatar(${u.id}, this)">
+                            </label>
+                            <div><strong>${u.username}</strong>${isSelf ? ' <span style="font-size:.7rem;color:var(--primary)">(you)</span>' : ''}</div>
+                        </div>
+                    </td>
                     <td>${u.fullName}</td>
                     <td>${u.email || '—'}</td>
                     <td><span class="role-chip ${u.role}">${u.role}</span></td>
@@ -256,7 +375,7 @@
             document.getElementById('modal-title').textContent  = 'Edit User — ' + u.username;
             document.getElementById('edit-user-id').value       = u.id;
             document.getElementById('f-username').value         = u.username;
-            document.getElementById('f-username').disabled      = true;
+            document.getElementById('f-username').disabled      = false;
             document.getElementById('f-fullname').value         = u.fullName;
             document.getElementById('f-email').value            = u.email || '';
             document.getElementById('f-role').value             = u.role;
@@ -266,18 +385,44 @@
         } catch { showAlert('alert-box', 'Failed to load user details.', 'danger'); }
     }
 
-    async function toggleActive(id, username, currentlyActive) {
-        if (!confirm((currentlyActive ? 'Deactivate' : 'Activate') + ' user ' + username + '?')) return;
-        const res = await UserAPI.toggleActive(id);
-        if (res.success) { showAlert('alert-box', res.message, 'info'); loadUsers(); }
-        else showAlert('alert-box', res.message || 'Failed.', 'danger');
+    function toggleActive(id, username, currentlyActive) {
+        const action = currentlyActive ? 'Deactivate' : 'Activate';
+        showConfirm(action + ' User', action + ' user account "' + username + '"?', currentlyActive ? '⏸️' : '▶️', async () => {
+            const res = await UserAPI.toggleActive(id);
+            if (res.success) { showAlert('alert-box', res.message, 'info'); loadUsers().then(() => updateUserStats()); }
+            else showAlert('alert-box', res.message || 'Failed.', 'danger');
+        }, action, currentlyActive ? 'btn-warning' : 'btn-success');
     }
 
-    async function deleteUser(id, username) {
-        if (!confirm('Permanently delete user ' + username + '?\nThis cannot be undone.')) return;
-        const res = await UserAPI.delete(id);
-        if (res.success) { showAlert('alert-box', 'User ' + username + ' deleted.', 'warning'); loadUsers(); }
-        else showAlert('alert-box', res.message || 'Failed to delete.', 'danger');
+    function deleteUser(id, username) {
+        showConfirm('Delete User', 'Permanently delete user "' + username + '"? This action cannot be undone.', '🗑️', async () => {
+            const res = await UserAPI.delete(id);
+            if (res.success) { showAlert('alert-box', 'User ' + username + ' deleted.', 'warning'); loadUsers().then(() => updateUserStats()); }
+            else showAlert('alert-box', res.message || 'Failed to delete.', 'danger');
+        }, 'Delete', 'btn-danger');
+    }
+
+    async function uploadAvatar(userId, input) {
+        const file = input.files[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) { showAlert('alert-box', 'Image must be under 2MB.', 'danger'); return; }
+        const reader = new FileReader();
+        reader.onload = async () => {
+            try {
+                const res = await UserAPI.uploadAvatar(userId, reader.result);
+                if (res.success) {
+                    showAlert('alert-box', 'Avatar updated successfully.', 'success');
+                    loadUsers();
+                    if (userId == myUser.id) {
+                        const user = getUser();
+                        user.avatarUrl = res.avatarUrl;
+                        localStorage.setItem('user', JSON.stringify(user));
+                        renderNavUser();
+                    }
+                } else showAlert('alert-box', res.message || 'Upload failed.', 'danger');
+            } catch { showAlert('alert-box', 'Upload error.', 'danger'); }
+        };
+        reader.readAsDataURL(file);
     }
 
     function openChangePwd(id, username) {
@@ -302,7 +447,20 @@
         finally { btn.disabled = false; btn.textContent = 'Change Password'; }
     });
 
-    loadUsers();
+    loadUsers().then(() => updateUserStats());
+
+    async function updateUserStats() {
+        try {
+            const users = await UserAPI.getAll();
+            const admins   = users.filter(u => u.role === 'ADMIN').length;
+            const managers = users.filter(u => u.role === 'MANAGER').length;
+            const staff    = users.filter(u => u.role === 'STAFF').length;
+            document.getElementById('ustat-admin').textContent   = admins;
+            document.getElementById('ustat-manager').textContent = managers;
+            document.getElementById('ustat-staff').textContent   = staff;
+            document.getElementById('ustat-total').textContent   = users.length;
+        } catch { /* silent */ }
+    }
 </script>
 </body>
 </html>

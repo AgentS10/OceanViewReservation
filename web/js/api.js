@@ -89,7 +89,8 @@ const UserAPI = {
     update:          (id, data)   => apiPut('/api/users/' + id, data),
     delete:          (id)         => apiDelete('/api/users/' + id),
     toggleActive:    (id)         => apiPost('/api/users/' + id + '/toggle-active', {}),
-    changePassword:  (id, newPwd) => apiPost('/api/users/' + id + '/change-password', { newPassword: newPwd })
+    changePassword:  (id, newPwd) => apiPost('/api/users/' + id + '/change-password', { newPassword: newPwd }),
+    uploadAvatar:    (id, base64) => apiPost('/api/users/' + id + '/avatar', { avatar: base64 })
 };
 
 // Admin API (ADMIN / MANAGER)

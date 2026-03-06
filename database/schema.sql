@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(64) NOT NULL,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100),
+    avatar_url VARCHAR(255) DEFAULT NULL,
     role ENUM('ADMIN', 'MANAGER', 'STAFF') DEFAULT 'STAFF',
     is_active TINYINT(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

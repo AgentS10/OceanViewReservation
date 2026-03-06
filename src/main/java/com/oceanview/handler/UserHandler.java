@@ -67,6 +67,12 @@ public class UserHandler extends BaseHandler implements HttpHandler {
             handleChangePassword(exchange, id);
             return;
         }
+        if (param.contains("/avatar")) {
+            int id = parseId(param.replace("/avatar", ""));
+            if (id < 0) { sendJson(exchange, 400, JsonUtil.error("Invalid user ID")); return; }
+            handleAvatarUpload(exchange, id);
+            return;
+        }
 
         int id = parseId(param);
         if (id < 0) { sendJson(exchange, 400, JsonUtil.error("Invalid user ID")); return; }
@@ -183,6 +189,30 @@ public class UserHandler extends BaseHandler implements HttpHandler {
             sendJson(exchange, 500, JsonUtil.error("Failed to change password")); return;
         }
         sendJson(exchange, 200, JsonUtil.success("Password changed successfully"));
+    }
+
+    private void handleAvatarUpload(HttpExchange exchange, int id) throws IOException {
+        Map<String, String> p = JsonUtil.parseObject(readBody(exchange));
+        String dataUrl = p.get("avatar");
+        if (dataUrl == null || !dataUrl.startsWith("data:image/")) {
+            sendJson(exchange, 400, JsonUtil.error("Invalid image data")); return;
+        }
+        try {
+            String base64 = dataUrl.substring(dataUrl.indexOf(",") + 1);
+            byte[] bytes = java.util.Base64.getDecoder().decode(base64);
+            String ext = dataUrl.contains("png") ? ".png" : ".jpg";
+            String filename = "avatar_" + id + "_" + System.currentTimeMillis() + ext;
+            java.nio.file.Path dir = java.nio.file.Paths.get("web", "uploads", "avatars");
+            java.nio.file.Files.createDirectories(dir);
+            java.nio.file.Path file = dir.resolve(filename);
+            java.nio.file.Files.write(file, bytes);
+            String url = "/uploads/avatars/" + filename;
+            userDAO.updateAvatar(id, url);
+            sendJson(exchange, 200, JsonUtil.success("Avatar updated", "avatarUrl", "\"" + url + "\""));
+        } catch (Exception e) {
+            System.err.println("[UserHandler] avatar upload error: " + e.getMessage());
+            sendJson(exchange, 500, JsonUtil.error("Failed to upload avatar"));
+        }
     }
 
     private int parseId(String s) {

@@ -8,24 +8,7 @@ renderNavUser();
 /* ─── ADD RESERVATION PAGE ─────────────────────────── */
 if (document.getElementById('add-reservation-form')) {
 
-    // Populate room type dropdown
-    RoomAPI.getAll().then(rooms => {
-        const sel = document.getElementById('roomTypeName');
-        rooms.forEach(rt => {
-            const opt = document.createElement('option');
-            opt.value = rt.typeName;
-            opt.textContent = rt.typeName + '  (LKR ' + Number(rt.pricePerNight).toLocaleString() + '/night)';
-            sel.appendChild(opt);
-        });
-    });
-
-    // Set min date for check-in to today
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('checkInDate').setAttribute('min', today);
-
-    document.getElementById('checkInDate').addEventListener('change', function () {
-        document.getElementById('checkOutDate').setAttribute('min', this.value);
-    });
+    // Room type dropdown + date min logic handled in add-reservation.html inline script
 
     document.getElementById('add-reservation-form').addEventListener('submit', async function (e) {
         e.preventDefault();
