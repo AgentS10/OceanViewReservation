@@ -65,7 +65,7 @@ class ValidationTest {
 
     // --- Username tests ---
     @ParameterizedTest
-    @ValueSource(strings = {"admin", "staff_01", "JohnDoe"})
+    @ValueSource(strings = {"admin", "staff_01", "Kavindhi"})
     void testValidUsernames(String username) {
         assertTrue(ValidationUtil.isValidUsername(username));
     }

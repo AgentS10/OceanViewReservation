@@ -1,273 +1,228 @@
-# 🌊 Ocean View Resort — Room Reservation System
+# Ocean View Resort — Room Reservation System
 
-| | |
-|---|---|
-| **Module** | CIS6003 Advanced Programming |
-| **Assignment** | WRIT1 — 2025/26 |
-| **Author** | Mohamed Subair Mohamed Sajidh |
-| **Version** | 2.0 |
+**Module:** CIS6003 Advanced Programming  
+**Assignment:** WRIT1 — 2025/26  
+**Author:** Mohamed Subair Mohamed Sajidh  
+**GitHub:** https://github.com/AgentS10/OceanViewReservation
 
 ---
 
-A fully functional **web-based hotel room reservation system** built with:
-- **Backend**: Plain Java (JDK 11) — `com.sun.net.httpserver.HttpServer` (no Spring/framework)
-- **Frontend**: Native HTML5, CSS3, JavaScript (no React/Angular/Vue)
-- **Database**: MySQL 8 via raw JDBC (no ORM/Hibernate)
-- **Testing**: JUnit 5 (TDD) — 5 test classes, 40+ test cases
-- **Build**: Apache Maven
+This is my WRIT1 assignment for CIS6003. It is a web-based room reservation system for a hotel called Ocean View Resort in Galle, Sri Lanka. The whole thing is built from scratch using plain Java and native HTML/CSS/JavaScript — no Spring, no React, no ORMs. The backend runs on Java's built-in HTTP server and talks to a MySQL database through JDBC.
 
----
+## What it does
 
-## 📁 Project Structure
+- Staff can log in and create room reservations for guests
+- Managers can edit, cancel, and check guests in/out
+- Admins can manage user accounts and monitor who is logged in
+- Any logged-in user can calculate a bill (nights x room rate + 10% tax) and print it
+- Sessions expire after 8 hours automatically
+
+## Tech Stack
+
+- **Backend:** Java 11, `com.sun.net.httpserver.HttpServer`
+- **Frontend:** HTML5, CSS3, plain JavaScript (fetch API)
+- **Database:** MySQL 9, raw JDBC with PreparedStatements
+- **Build:** Apache Maven
+- **Tests:** JUnit 5, 76 test cases across 5 test classes
+
+## Project Structure
 
 ```
 OceanViewReservation/
-├── docs/                             # UML diagrams (PlantUML)
-│   ├── class-diagram.puml
-│   ├── use-case-diagram.puml
-│   ├── sequence-login.puml
-│   └── sequence-create-reservation.puml
 ├── database/
-│   └── schema.sql                    # MySQL schema v2 + seed data
-├── src/
-│   ├── main/java/com/oceanview/
-│   │   ├── Main.java                 # Entry point + shutdown hook
-│   │   ├── server/WebServer.java     # Plain Java HTTP server
-│   │   ├── handler/                  # MVC Controllers
-│   │   │   ├── BaseHandler.java      # RBAC helpers + shared utils
-│   │   │   ├── AuthHandler.java      # Login / logout / session status
-│   │   │   ├── ReservationHandler.java  # Full CRUD + check-in/out
-│   │   │   ├── BillHandler.java      # Bill calculation
-│   │   │   ├── RoomHandler.java      # Room type catalogue
-│   │   │   ├── HelpHandler.java      # Help guide
-│   │   │   ├── UserHandler.java      # User CRUD (ADMIN only)
-│   │   │   ├── AdminHandler.java     # Session monitor + stats
-│   │   │   └── StaticFileHandler.java
-│   │   ├── dao/                      # Data Access Object pattern
-│   │   │   ├── UserDAO.java          # Full CRUD + auth
-│   │   │   ├── ReservationDAO.java
-│   │   │   └── RoomTypeDAO.java
-│   │   ├── model/                    # Domain models
-│   │   │   ├── User.java             # Roles: ADMIN / MANAGER / STAFF
-│   │   │   ├── Reservation.java      # Status: CONFIRMED → CHECKED_IN → CHECKED_OUT
-│   │   │   ├── RoomType.java
-│   │   │   └── Bill.java
-│   │   ├── database/
-│   │   │   └── DatabaseConnection.java  # Singleton pattern
-│   │   ├── factory/                  # Factory pattern
-│   │   │   ├── Room.java             # Product interface
-│   │   │   ├── StandardRoom.java
-│   │   │   ├── DeluxeRoom.java
-│   │   │   ├── SuiteRoom.java
-│   │   │   └── RoomFactory.java      # Creator
-│   │   ├── observer/                 # Observer pattern
-│   │   │   ├── ReservationObserver.java   # Observer interface
-│   │   │   ├── ReservationNotifier.java   # Subject (Singleton)
-│   │   │   └── LogNotificationObserver.java  # Concrete observer
-│   │   └── util/
-│   │       ├── JsonUtil.java
-│   │       ├── SessionManager.java   # In-memory session store (Singleton)
-│   │       ├── PasswordUtil.java     # SHA-256 hashing
-│   │       └── ValidationUtil.java
-│   └── test/java/com/oceanview/
-│       ├── BillCalculationTest.java  # Bill + night-count tests
-│       ├── ValidationTest.java       # Input validation tests
-│       ├── ReservationTest.java      # Factory pattern + model tests
-│       ├── UserAuthTest.java         # Password hashing tests
-│       └── SessionAndRbacTest.java   # Session lifecycle + RBAC tests
-├── web/                              # Native HTML/CSS/JS frontend
-│   ├── index.html                    # Split-hero login page
-│   ├── dashboard.html                # Stats + recent reservations
-│   ├── add-reservation.html          # Create reservation form
-│   ├── reservations.html             # List + search
-│   ├── view-reservation.html         # Detail + check-in/out buttons
-│   ├── bill.html                     # Invoice / printable bill
-│   ├── help.html                     # User guide
-│   ├── admin.html                    # Session monitor + stats (ADMIN/MANAGER)
-│   ├── users.html                    # User management (ADMIN only)
-│   ├── css/style.css                 # v2 design system
+│   └── schema.sql                    # MySQL schema and seed data
+├── src/main/java/com/oceanview/
+│   ├── Main.java                     # entry point, starts server on port 8081
+│   ├── server/
+│   │   └── WebServer.java            # registers all route handlers
+│   ├── handler/
+│   │   ├── BaseHandler.java          # shared auth helpers, RBAC enforcement
+│   │   ├── AuthHandler.java          # login, logout, session check
+│   │   ├── ReservationHandler.java   # reservation CRUD + check-in/out
+│   │   ├── BillHandler.java          # bill calculation endpoint
+│   │   ├── UserHandler.java          # user management (admin only)
+│   │   ├── AdminHandler.java         # session monitoring and stats
+│   │   ├── RoomHandler.java          # room types list
+│   │   ├── HelpHandler.java          # help content
+│   │   └── StaticFileHandler.java    # serves the web/ folder
+│   ├── dao/
+│   │   ├── UserDAO.java              # all SQL for users table
+│   │   ├── ReservationDAO.java       # all SQL for reservations table
+│   │   └── RoomTypeDAO.java          # room types queries
+│   ├── model/
+│   │   ├── User.java
+│   │   ├── Reservation.java
+│   │   ├── Bill.java
+│   │   └── RoomType.java
+│   ├── database/
+│   │   └── DatabaseConnection.java   # Singleton JDBC connection
+│   ├── factory/
+│   │   ├── Room.java                 # abstract product
+│   │   ├── StandardRoom.java
+│   │   ├── DeluxeRoom.java
+│   │   ├── SuiteRoom.java
+│   │   └── RoomFactory.java          # Factory pattern
+│   ├── observer/
+│   │   ├── ReservationObserver.java  # observer interface
+│   │   ├── ReservationNotifier.java  # subject (Singleton)
+│   │   └── LogNotificationObserver.java
+│   └── util/
+│       ├── SessionManager.java       # in-memory session store, UUID tokens
+│       ├── PasswordUtil.java         # SHA-256 hashing
+│       ├── JsonUtil.java             # manual JSON builder/parser
+│       └── ValidationUtil.java
+├── src/test/java/com/oceanview/
+│   ├── BillCalculationTest.java
+│   ├── ValidationTest.java
+│   ├── ReservationTest.java
+│   ├── UserAuthTest.java
+│   └── SessionAndRbacTest.java
+├── web/
+│   ├── index.html                    # login page
+│   ├── dashboard.html
+│   ├── add-reservation.html
+│   ├── reservations.html
+│   ├── view-reservation.html
+│   ├── bill.html
+│   ├── users.html                    # admin only
+│   ├── admin.html                    # admin/manager only
+│   ├── help.html
+│   ├── css/style.css
 │   └── js/
-│       ├── api.js                    # Centralised REST client
-│       ├── auth.js                   # Auth guard + role-aware navbar
+│       ├── api.js                    # all fetch() calls in one place
+│       ├── auth.js                   # login guard, sidebar, role nav
 │       ├── dashboard.js
 │       ├── reservation.js
 │       └── bill.js
 └── pom.xml
 ```
 
----
+## Design Patterns
 
-## 🏗 Architecture & Design Patterns
+I used four design patterns as required by the assignment:
 
-### 3-Tier Architecture
-| Tier | Technology |
-|------|-----------|
-| **Presentation** | Native HTML5 / CSS3 / JavaScript (no framework) |
-| **Business Logic** | Plain Java handlers + service logic |
-| **Data** | MySQL 8 via JDBC (DAO pattern, no ORM) |
+**Singleton** — `DatabaseConnection` and `SessionManager` both use the singleton pattern so there is only ever one database connection and one session store across the whole application.
 
-### Design Patterns Implemented
-| Pattern | Class(es) | Purpose |
-|---------|-----------|---------|
-| **Singleton** | `DatabaseConnection`, `SessionManager`, `ReservationNotifier` | Controlled single instance |
-| **Factory** | `RoomFactory`, `Room`, `StandardRoom`, `DeluxeRoom`, `SuiteRoom` | Decouple room creation from client |
-| **Observer** | `ReservationNotifier`, `ReservationObserver`, `LogNotificationObserver` | Event-driven reservation notifications |
-| **DAO** | `UserDAO`, `ReservationDAO`, `RoomTypeDAO` | Encapsulate all DB operations |
-| **MVC** | Handlers (Controller) + Models + HTML pages (View) | Separation of concerns |
+**Factory** — `RoomFactory.createRoom("deluxe")` returns the right room object without the caller needing to know the class name. Adding a new room type only means adding one new class.
 
-### Role-Based Access Control (RBAC)
-| Feature | ADMIN | MANAGER | STAFF |
-|---------|:-----:|:-------:|:-----:|
-| Create / view reservations | ✅ | ✅ | ✅ |
-| Update reservation | ✅ | ✅ | ✅ |
-| Check in guest | ✅ | ✅ | ✅ |
-| Calculate bill | ✅ | ✅ | ✅ |
-| Check out guest | ✅ | ✅ | ❌ |
-| Cancel reservation | ✅ | ✅ | ❌ |
-| View admin panel & stats | ✅ | ✅ | ❌ |
-| Terminate active sessions | ✅ | ❌ | ❌ |
-| Manage users (CRUD) | ✅ | ❌ | ❌ |
+**Observer** — When a reservation is created, updated or cancelled, `ReservationNotifier` notifies all registered observers. Currently `LogNotificationObserver` logs to the console. You could add an email observer without touching any handler code.
 
----
+**DAO** — All SQL is inside `UserDAO`, `ReservationDAO`, and `RoomTypeDAO`. The handler classes never write SQL directly, which makes it easier to maintain and test.
 
-## 📐 UML Diagrams
+## Role Permissions
 
-All diagrams are located in the `docs/` folder in **PlantUML** (`.puml`) format.
-Render them using [PlantUML Online Server](https://www.plantuml.com/plantuml/uml/) or the VS Code PlantUML extension.
+| Action | ADMIN | MANAGER | STAFF |
+|--------|-------|---------|-------|
+| Create and view reservations | yes | yes | yes |
+| Edit reservation | yes | yes | yes |
+| Check in guest | yes | yes | yes |
+| Calculate and print bill | yes | yes | yes |
+| Check out guest | yes | yes | no |
+| Cancel reservation | yes | yes | no |
+| View reports and session monitor | yes | yes | no |
+| Terminate a session | yes | no | no |
+| Manage user accounts | yes | no | no |
 
-| File | Diagram |
-|------|---------|
-| `docs/class-diagram.puml` | Full class diagram with all packages, attributes, methods and relationships |
-| `docs/use-case-diagram.puml` | Use case diagram showing actor-role hierarchy and feature access |
-| `docs/sequence-login.puml` | Sequence diagram — user login flow with session creation |
-| `docs/sequence-create-reservation.puml` | Sequence diagram — reservation creation with Observer notification |
+## How to Run
 
----
+**Requirements:** Java 11, Maven, MySQL 9
 
-## 🚀 Setup & Run
+**Step 1 — Set up the database**
 
-### Prerequisites
-- Java JDK 11+
-- Apache Maven 3.6+
-- MySQL 8.0+
-
-### 1. Database Setup
-```sql
--- Run in MySQL Workbench or CLI:
-source database/schema.sql
+```bash
+mysql -u root -proot < database/schema.sql
 ```
 
-### 2. Configure Database Credentials
-Edit `src/main/java/com/oceanview/database/DatabaseConnection.java`:
-```java
-private static final String DB_URL      = "jdbc:mysql://localhost:3306/oceanview_db?...";
-private static final String DB_USERNAME = "root";
-private static final String DB_PASSWORD = "your_password";
-```
+**Step 2 — Build**
 
-### 3. Build
 ```bash
 mvn clean package
 ```
 
-### 4. Run
+**Step 3 — Run**
+
 ```bash
-# From project root (web/ directory must be in working dir)
-java -jar target/ocean-view-reservation-1.0.0-jar-with-dependencies.jar
+java -jar target/ocean-view-reservation-1.0.0-jar-with-dependencies.jar 8081
 ```
 
-### 5. Open Browser
-Navigate to: **http://localhost:8080**
+**Step 4 — Open browser**
 
-### Default Login Credentials
-| Role | Username | Password | Full Name |
-|------|----------|----------|-----------|
-| Administrator | `admin`   | `Admin@123`   | Mohamed Subair Mohamed Sajidh |
-| Manager       | `manager` | `Manager@123` | Ruwan Karunaratne |
-| Staff         | `staff`   | `Staff@123`   | Chaminda Perera |
-| Staff         | `kavindi` | `Staff@123`   | Kavindi Senanayake |
+Go to: http://localhost:8081
 
----
+**Login credentials (from seed data)**
 
-## 🌐 REST API Endpoints
+| Role | Username | Password |
+|------|----------|----------|
+| Admin | admin | Admin@123 |
+| Manager | manager | Manager@123 |
+| Staff | staff | Staff@123 |
+| Staff | kavindi | Staff@123 |
 
-### Authentication
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| POST | `/api/auth/login` | None | Authenticate and get session token |
-| POST | `/api/auth/logout` | Any | Invalidate session |
-| GET  | `/api/auth/status` | Any | Check session validity |
+## API Endpoints
 
-### Reservations
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET    | `/api/reservations` | Any | List all (supports `?search=name`) |
-| POST   | `/api/reservations` | Any | Create reservation |
-| GET    | `/api/reservations/{num}` | Any | Get by reservation number |
-| PUT    | `/api/reservations/{num}` | Any | Update reservation |
-| DELETE | `/api/reservations/{num}` | MANAGER+ | Cancel reservation |
-| POST   | `/api/reservations/{num}/checkin`  | Any | Mark as CHECKED_IN |
-| POST   | `/api/reservations/{num}/checkout` | MANAGER+ | Mark as CHECKED_OUT |
+All endpoints require `Authorization: Bearer <token>` except login.
 
-### Admin & Users
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET    | `/api/admin/stats` | MANAGER+ | Dashboard statistics |
-| GET    | `/api/admin/sessions` | MANAGER+ | List active sessions |
-| DELETE | `/api/admin/sessions/{token}` | ADMIN | Force-terminate session |
-| GET    | `/api/users` | ADMIN | List all users |
-| GET    | `/api/users/{id}` | ADMIN | Get user by ID |
-| POST   | `/api/users` | ADMIN | Create user |
-| PUT    | `/api/users/{id}` | ADMIN | Update user |
-| DELETE | `/api/users/{id}` | ADMIN | Delete user |
-| POST   | `/api/users/{id}/toggle-active` | ADMIN | Activate / deactivate |
-| POST   | `/api/users/{id}/change-password` | ADMIN | Reset password |
+**Auth**
+- `POST /api/auth/login` — returns session token
+- `POST /api/auth/logout` — removes session
+- `GET /api/auth/status` — check if token is still valid
 
-### Other
-| Method | Endpoint | Auth | Description |
-|--------|----------|------|-------------|
-| GET | `/api/bill/{num}` | Any | Calculate bill for reservation |
-| GET | `/api/rooms` | Any | List room types |
-| GET | `/api/help` | Any | System help guide |
+**Reservations**
+- `GET /api/reservations` — list all, supports `?search=name`
+- `POST /api/reservations` — create new
+- `GET /api/reservations/{num}` — get one by reservation number
+- `PUT /api/reservations/{num}` — update
+- `DELETE /api/reservations/{num}` — cancel (manager/admin only)
+- `POST /api/reservations/{num}/checkin` — set status to CHECKED_IN
+- `POST /api/reservations/{num}/checkout` — set status to CHECKED_OUT
 
----
+**Bill and Rooms**
+- `GET /api/bill/{num}` — calculate bill for a reservation
+- `GET /api/rooms` — list room types and prices
 
-## 🧪 Running Tests
+**Admin (admin/manager only)**
+- `GET /api/admin/stats` — totals for dashboard
+- `GET /api/admin/sessions` — list active sessions
+- `DELETE /api/admin/sessions/{token}` — kick a session (admin only)
+
+**Users (admin only)**
+- `GET /api/users` — list all accounts
+- `POST /api/users` — create account
+- `PUT /api/users/{id}` — update account
+- `DELETE /api/users/{id}` — delete account
+- `POST /api/users/{id}/toggle-active` — enable or disable
+- `POST /api/users/{id}/change-password` — reset password
+- `POST /api/users/{id}/avatar` — upload profile picture
+
+## Running the Tests
 
 ```bash
 mvn test
 ```
 
-| Test Class | Coverage |
-|------------|---------|
-| `BillCalculationTest` | Bill calculation, tax computation (10%), night counting |
-| `ValidationTest` | Contact numbers, dates, usernames, password strength |
-| `ReservationTest` | Factory pattern (all 3 room types), Reservation JSON serialisation |
-| `UserAuthTest` | SHA-256 hashing, hash verification, seed hash values |
-| `SessionAndRbacTest` | Session lifecycle, RBAC role hierarchy, session info JSON |
+Expected output: `Tests run: 76, Failures: 0, Errors: 0, Skipped: 0`
 
----
+| Test Class | What it tests |
+|------------|---------------|
+| BillCalculationTest | bill.calculate() across different night/price combinations, tax at 10% |
+| ValidationTest | contact numbers, date format, checkout after checkin, username/password rules |
+| ReservationTest | RoomFactory creates correct objects, Reservation toJson output |
+| UserAuthTest | SHA-256 hash consistency, verify(), known seed hashes |
+| SessionAndRbacTest | session create/get/expire/invalidate, RBAC role hierarchy |
 
-## ✅ System Functionalities
+## Room Prices
 
-1. **Multi-Role Authentication** — SHA-256 hashed passwords, UUID session tokens, 8-hour expiry
-2. **Role-Based Access Control** — ADMIN / MANAGER / STAFF role hierarchy enforced server-side
-3. **Reservation Management** — Full CRUD with server-side validation and search
-4. **Status Lifecycle** — CONFIRMED → CHECKED_IN → CHECKED_OUT (or CANCELLED)
-5. **Bill Calculation** — Nights × room rate + 10% tax, printable invoice
-6. **Active Session Monitoring** — Real-time session list with IP, login time, last-active
-7. **User Management** — Full CRUD on user accounts, activate/deactivate, password change
-8. **Dashboard Analytics** — Live stats: total bookings, revenue, active sessions
-9. **Observer Notifications** — Console logging on reservation events (extendable to email/SMS)
-10. **Help Guide** — Inline usage instructions for staff
-11. **Responsive UI** — Modern v2 CSS design system with role-aware navigation
+| Room | Price per night | Capacity |
+|------|----------------|----------|
+| Standard | LKR 5,000 | 2 |
+| Deluxe | LKR 8,000 | 2 |
+| Suite | LKR 15,000 | 4 |
 
----
+Bill formula: `total = (nights x rate) + (nights x rate x 0.10)`
 
-## 📚 References
+## References
 
-- Oracle (2024) *Java SE 11 Documentation — com.sun.net.httpserver*. Available at: https://docs.oracle.com/en/java/
-- MySQL (2024) *MySQL 8.0 Reference Manual*. Available at: https://dev.mysql.com/doc/
-- JUnit Team (2024) *JUnit 5 User Guide*. Available at: https://junit.org/junit5/docs/current/user-guide/
-- Gamma, E., Helm, R., Johnson, R. and Vlissides, J. (1994) *Design Patterns: Elements of Reusable Object-Oriented Software*. Addison-Wesley.
-- PlantUML (2024) *PlantUML Language Reference Guide*. Available at: https://plantuml.com/guide
+- Oracle (2024) Java SE 11 API Documentation. https://docs.oracle.com/en/java/javase/11/
+- MySQL (2024) MySQL 8.0 Reference Manual. https://dev.mysql.com/doc/
+- JUnit Team (2024) JUnit 5 User Guide. https://junit.org/junit5/docs/current/user-guide/
+- Gamma, E. et al. (1994) Design Patterns: Elements of Reusable Object-Oriented Software. Addison-Wesley.

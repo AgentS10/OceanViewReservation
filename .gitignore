@@ -8,3 +8,23 @@ target/
 .project
 .classpath
 *.log
+
+# Personal notes and local-only files (not pushed to GitHub)
+notes.txt
+personal/
+*.personal.*
+VIVA_DOCUMENTATION.md
+*_NOTES.md
+*_LOCAL.md
+
+# Uploaded avatars (user content, not source code)
+web/uploads/
+
+# Local environment overrides
+local.properties
+env.local
+
+# Assignment documents (Word files — submit separately, not via GitHub)
+*.docx
+*.doc
+~$*
