@@ -25,7 +25,7 @@ public class Main {
         ReservationNotifier.getInstance().addObserver(new LogNotificationObserver());
 
         // Start HTTP server (plain Java — no Spring/Servlet framework)
-        int port = 8080;
+        int port = 8081;
         if (args.length > 0) {
             try { port = Integer.parseInt(args[0]); } catch (NumberFormatException ignored) {}
         }
